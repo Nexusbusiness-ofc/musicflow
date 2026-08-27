@@ -192,10 +192,13 @@ body {
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  background: rgba(255, 255, 255, 0.15);
+  width: 100%;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 999px;
   outline: none;
   height: 5px;
+  cursor: pointer;
+  display: block;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -206,12 +209,20 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: #ffffff;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  transition: transform 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
-input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.3);
+input[type="range"]:hover::-webkit-slider-thumb,
+input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.35);
+  background: var(--song-primary, #1db954);
+}
+
+.fs-progress-slider {
+  width: 100% !important;
+  height: 5px;
+  border-radius: 999px;
 }
 
 /* Equalizer Vertical Sliders */
