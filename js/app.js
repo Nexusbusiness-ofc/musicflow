@@ -162,6 +162,8 @@
         try {
           song.cover_url = URL.createObjectURL(song.cover_blob);
         } catch (e) {}
+      } else if (!song.cover_url || (typeof song.cover_url === 'string' && song.cover_url.startsWith('blob:'))) {
+        song.cover_url = generateModernCoverSvg(song.title, song.artist);
       }
       return song;
     });
@@ -1078,21 +1080,52 @@
   // 5. RESILIENT ID3 TAG PARSER & BATCH IMPORTER
   // ==========================================
 
-  function getRandomGradientCover(seed = 'musicflow') {
-    const gradients = ['#1db954', '#6366f1', '#ec4899', '#f59e0b', '#3b82f6', '#10b981'];
+  function generateModernCoverSvg(title = 'Música', artist = '') {
+    const gradients = [
+      ['#1db954', '#065f46'],
+      ['#6366f1', '#312e81'],
+      ['#ec4899', '#831843'],
+      ['#f59e0b', '#78350f'],
+      ['#3b82f6', '#1e3a8a'],
+      ['#8b5cf6', '#4c1d95'],
+      ['#ef4444', '#7f1d1d'],
+      ['#14b8a6', '#134e4a']
+    ];
+
     let hash = 0;
-    for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
-    const color = gradients[Math.abs(hash) % gradients.length];
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
-      <rect width="300" height="300" fill="${color}"/>
-      <circle cx="150" cy="150" r="60" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="8"/>
-      <path d="M140 125 L175 150 L140 175 Z" fill="#ffffff"/>
+    const str = (title + artist) || 'MusicFlow';
+    for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    const colorPair = gradients[Math.abs(hash) % gradients.length];
+
+    const safeTitle = (title || 'Music').substring(0, 16).replace(/[<>&"]/g, '');
+    const safeArtist = (artist || 'MusicFlow').substring(0, 18).replace(/[<>&"]/g, '');
+    const initial = safeTitle.charAt(0).toUpperCase() || '♪';
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+      <defs>
+        <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="${colorPair[0]}"/>
+          <stop offset="100%" stop-color="${colorPair[1]}"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="400" fill="url(#g)"/>
+      <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="20"/>
+      <circle cx="200" cy="200" r="90" fill="rgba(0,0,0,0.25)" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
+      <text x="200" y="195" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-weight="900" font-size="72" fill="#ffffff" text-anchor="middle" dominant-baseline="middle" opacity="0.95">${initial}</text>
+      <text x="200" y="320" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-weight="700" font-size="20" fill="#ffffff" text-anchor="middle" opacity="0.9">${safeTitle}</text>
+      <text x="200" y="348" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-weight="500" font-size="14" fill="rgba(255,255,255,0.7)" text-anchor="middle">${safeArtist}</text>
     </svg>`;
+
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+  }
+
+  function getRandomGradientCover(seed = 'musicflow') {
+    return generateModernCoverSvg(seed);
   }
 
   async function parseID3Tags(file) {
     let coverBlobUrl = null;
+    let coverBlob = null;
     let title = null;
     let artist = null;
     let album = null;
@@ -1138,10 +1171,12 @@
             const frame = bytes.subarray(i + 10, i + 10 + Math.min(len, 500000));
             for (let j = 0; j < frame.length - 4; j++) {
               if (frame[j] === 0xFF && frame[j+1] === 0xD8) {
-                coverBlobUrl = URL.createObjectURL(new Blob([frame.subarray(j)], { type: 'image/jpeg' }));
+                coverBlob = new Blob([frame.subarray(j)], { type: 'image/jpeg' });
+                coverBlobUrl = URL.createObjectURL(coverBlob);
                 break;
               } else if (frame[j] === 0x89 && frame[j+1] === 0x50 && frame[j+2] === 0x4E && frame[j+3] === 0x43) {
-                coverBlobUrl = URL.createObjectURL(new Blob([frame.subarray(j)], { type: 'image/png' }));
+                coverBlob = new Blob([frame.subarray(j)], { type: 'image/png' });
+                coverBlobUrl = URL.createObjectURL(coverBlob);
                 break;
               }
             }
@@ -1152,7 +1187,7 @@
       // Fallback
     }
 
-    return { title, artist, album, genre, year, lyrics, coverBlobUrl };
+    return { title, artist, album, genre, year, lyrics, coverBlobUrl, coverBlob };
   }
 
   async function parseAudioFileMetadata(file) {
@@ -1225,7 +1260,8 @@
       duration: realDuration || estimatedDuration,
       audio_url: url,
       audio_blob: file,
-      cover_url: id3.coverBlobUrl || getRandomGradientCover(title + artist),
+      cover_url: id3.coverBlobUrl || generateModernCoverSvg(title, artist),
+      cover_blob: id3.coverBlob || null,
       file_format: 'audio/mp3',
       file_size: file.size,
       bitrate: '320 kbps',
@@ -1707,10 +1743,12 @@
         return;
       }
 
-      container.innerHTML = songs.map(song => `
+      container.innerHTML = songs.map(song => {
+        const fallbackSrc = generateModernCoverSvg(song.title, song.artist);
+        return `
         <div class="music-card rounded-2xl p-3 cursor-pointer group flex flex-col justify-between" onclick="app.playSongDirect('${song.id}')">
-          <div class="relative aspect-square w-full rounded-xl overflow-hidden mb-2.5">
-            <img src="${song.cover_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="${song.title}">
+          <div class="relative aspect-square w-full rounded-xl overflow-hidden mb-2.5 bg-zinc-900">
+            <img src="${song.cover_url || fallbackSrc}" onerror="this.onerror=null; this.src='${fallbackSrc}';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="${song.title}">
             <button class="play-btn-overlay absolute bottom-2 right-2 w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shadow-xl">
               <i data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
             </button>
@@ -1725,36 +1763,43 @@
             </button>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
       if (window.lucide) window.lucide.createIcons();
     }
 
     renderAlbumCardsGrid(containerId, albums) {
       const container = document.getElementById(containerId);
       if (!container) return;
-      container.innerHTML = albums.map(alb => `
+      container.innerHTML = albums.map(alb => {
+        const fallbackSrc = generateModernCoverSvg(alb.name, alb.artist);
+        return `
         <div class="music-card rounded-2xl p-3 cursor-pointer group" onclick="app.viewAlbumDetail('${alb.name}')">
-          <div class="aspect-square w-full rounded-xl overflow-hidden mb-2.5">
-            <img src="${alb.cover_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="${alb.name}">
+          <div class="aspect-square w-full rounded-xl overflow-hidden mb-2.5 bg-zinc-900">
+            <img src="${alb.cover_url || fallbackSrc}" onerror="this.onerror=null; this.src='${fallbackSrc}';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="${alb.name}">
           </div>
           <h4 class="text-xs font-bold text-white truncate">${alb.name}</h4>
           <p class="text-[11px] text-[var(--text-secondary)] truncate">${alb.artist}</p>
         </div>
-      `).join('');
+      `;
+      }).join('');
     }
 
     renderArtistCardsGrid(containerId, artists) {
       const container = document.getElementById(containerId);
       if (!container) return;
-      container.innerHTML = artists.map(art => `
+      container.innerHTML = artists.map(art => {
+        const fallbackSrc = generateModernCoverSvg(art.name, 'Artista');
+        return `
         <div class="music-card rounded-2xl p-3 cursor-pointer group text-center" onclick="app.viewArtistDetail('${art.name}')">
-          <div class="aspect-square w-24 h-24 mx-auto rounded-full overflow-hidden mb-2.5 border-2 border-transparent group-hover:border-brand-spotify transition">
-            <img src="${art.image_url}" class="w-full h-full object-cover" alt="${art.name}">
+          <div class="aspect-square w-24 h-24 mx-auto rounded-full overflow-hidden mb-2.5 border-2 border-transparent group-hover:border-brand-spotify transition bg-zinc-900">
+            <img src="${art.image_url || fallbackSrc}" onerror="this.onerror=null; this.src='${fallbackSrc}';" class="w-full h-full object-cover" alt="${art.name}">
           </div>
           <h4 class="text-xs font-bold text-white truncate">${art.name}</h4>
           <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold mt-0.5">Artista</p>
         </div>
-      `).join('');
+      `;
+      }).join('');
     }
 
     renderPlaylistsCardsGrid(containerId, playlists) {
@@ -1764,15 +1809,18 @@
         container.innerHTML = `<div class="col-span-full py-6 text-center text-[var(--text-muted)] text-xs">Cria a tua primeira playlist com o botão acima.</div>`;
         return;
       }
-      container.innerHTML = playlists.map(pl => `
+      container.innerHTML = playlists.map(pl => {
+        const fallbackSrc = generateModernCoverSvg(pl.name, 'Playlist');
+        return `
         <div class="music-card rounded-2xl p-3 cursor-pointer group" onclick="app.viewPlaylistDetail('${pl.id}')">
-          <div class="aspect-square w-full rounded-xl overflow-hidden mb-2.5">
-            <img src="${pl.cover_url}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="${pl.name}">
+          <div class="aspect-square w-full rounded-xl overflow-hidden mb-2.5 bg-zinc-900">
+            <img src="${pl.cover_url || fallbackSrc}" onerror="this.onerror=null; this.src='${fallbackSrc}';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="${pl.name}">
           </div>
           <h4 class="text-xs font-bold text-white truncate">${pl.name}</h4>
           <p class="text-[11px] text-[var(--text-secondary)] truncate">${pl.description || 'Playlist do Utilizador'}</p>
         </div>
-      `).join('');
+      `;
+      }).join('');
     }
 
     filterLibrary(tabName) {
@@ -1871,13 +1919,13 @@
       if (this.libraryViewMode === 'grid') {
         container.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4';
         this.renderSongCardsGrid('library-content-list', filtered);
-      } else {
-        container.className = 'space-y-2';
-        container.innerHTML = filtered.map((song, idx) => `
+        container.innerHTML = filtered.map((song, idx) => {
+          const fallbackSrc = generateModernCoverSvg(song.title, song.artist);
+          return `
           <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] border border-[var(--border-color)] group cursor-pointer" onclick="app.playSongDirect('${song.id}')">
             <div class="flex items-center gap-3 min-w-0">
               <span class="text-xs font-mono text-[var(--text-muted)] w-5 text-center">${idx + 1}</span>
-              <img src="${song.cover_url}" class="w-10 h-10 rounded-lg object-cover" alt="${song.title}">
+              <img src="${song.cover_url || fallbackSrc}" onerror="this.onerror=null; this.src='${fallbackSrc}';" class="w-10 h-10 rounded-lg object-cover bg-zinc-900" alt="${song.title}">
               <div class="min-w-0">
                 <h4 class="text-xs font-bold text-white truncate">${song.title}</h4>
                 <p class="text-[11px] text-[var(--text-secondary)] truncate">${song.artist} • ${song.album}</p>
@@ -1893,7 +1941,8 @@
               </button>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
         if (window.lucide) window.lucide.createIcons();
       }
     }
@@ -1963,7 +2012,12 @@
       if (albumSongs.length === 0) return;
 
       const first = albumSongs[0];
-      document.getElementById('alb-detail-cover').src = first.cover_url;
+      const fallbackSrc = generateModernCoverSvg(albumName, first.artist);
+      const coverEl = document.getElementById('alb-detail-cover');
+      if (coverEl) {
+        coverEl.src = first.cover_url || fallbackSrc;
+        coverEl.onerror = () => { coverEl.src = fallbackSrc; };
+      }
       document.getElementById('alb-detail-name').innerText = albumName;
       document.getElementById('alb-detail-artist').innerText = first.artist;
       document.getElementById('alb-detail-meta').innerText = `${albumSongs.length} faixas • ${first.year || 2025}`;
@@ -1996,7 +2050,12 @@
       if (artistSongs.length === 0) return;
 
       const first = artistSongs[0];
-      document.getElementById('art-detail-img').src = first.cover_url;
+      const fallbackSrc = generateModernCoverSvg(artistName, 'Artista');
+      const artImg = document.getElementById('art-detail-img');
+      if (artImg) {
+        artImg.src = first.cover_url || fallbackSrc;
+        artImg.onerror = () => { artImg.src = fallbackSrc; };
+      }
       document.getElementById('art-detail-name').innerText = artistName;
       document.getElementById('art-detail-meta').innerText = `${artistSongs.length} faixas registadas`;
 
@@ -2007,11 +2066,13 @@
       };
 
       const listEl = document.getElementById('art-detail-songs-list');
-      listEl.innerHTML = artistSongs.map((song, idx) => `
+      listEl.innerHTML = artistSongs.map((song, idx) => {
+        const songFallback = generateModernCoverSvg(song.title, song.artist);
+        return `
         <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] border border-[var(--border-color)] group cursor-pointer" onclick="app.playSongDirect('${song.id}')">
           <div class="flex items-center gap-3 min-w-0">
             <span class="text-xs font-mono text-[var(--text-muted)] w-5 text-center">${idx + 1}</span>
-            <img src="${song.cover_url}" class="w-10 h-10 rounded-lg object-cover" alt="${song.title}">
+            <img src="${song.cover_url || songFallback}" onerror="this.onerror=null; this.src='${songFallback}';" class="w-10 h-10 rounded-lg object-cover bg-zinc-900" alt="${song.title}">
             <div class="min-w-0">
               <h4 class="text-xs font-bold text-white truncate">${song.title}</h4>
               <p class="text-[11px] text-[var(--text-secondary)] truncate">${song.album}</p>
@@ -2019,7 +2080,8 @@
           </div>
           <span class="text-xs font-mono text-[var(--text-muted)]">${this.formatDuration(song.duration)}</span>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       this.navigateTo('artist-detail');
     }
@@ -2047,9 +2109,11 @@
       container.innerHTML = `
         <h3 class="text-base font-bold mb-3">Músicas (${matchedSongs.length})</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-          ${matchedSongs.map(song => `
+          ${matchedSongs.map(song => {
+            const fallbackSrc = generateModernCoverSvg(song.title, song.artist);
+            return `
             <div class="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] border border-[var(--border-color)] cursor-pointer" onclick="app.playSongDirect('${song.id}')">
-              <img src="${song.cover_url}" class="w-12 h-12 rounded-lg object-cover" alt="${song.title}">
+              <img src="${song.cover_url || fallbackSrc}" onerror="this.onerror=null; this.src='${fallbackSrc}';" class="w-12 h-12 rounded-lg object-cover bg-zinc-900" alt="${song.title}">
               <div class="min-w-0 flex-1">
                 <h4 class="text-xs font-bold text-white truncate">${song.title}</h4>
                 <p class="text-[11px] text-[var(--text-secondary)] truncate">${song.artist} • ${song.album}</p>
@@ -2058,7 +2122,8 @@
                 <i data-lucide="plus-circle" class="w-4 h-4"></i>
               </button>
             </div>
-          `).join('')}
+          `;
+          }).join('')}
         </div>
       `;
       if (window.lucide) window.lucide.createIcons();
@@ -2079,11 +2144,12 @@
       container.innerHTML = historyEntries.slice(0, 30).map(item => {
         const song = songMap.get(item.song_id);
         if (!song) return '';
+        const fallbackSrc = generateModernCoverSvg(song.title, song.artist);
         const dateStr = new Date(item.played_at).toLocaleString('pt-PT', { dateStyle: 'short', timeStyle: 'short' });
         return `
           <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)]">
             <div class="flex items-center gap-3 min-w-0">
-              <img src="${song.cover_url}" class="w-10 h-10 rounded-lg object-cover" alt="${song.title}">
+              <img src="${song.cover_url || fallbackSrc}" onerror="this.onerror=null; this.src='${fallbackSrc}';" class="w-10 h-10 rounded-lg object-cover bg-zinc-900" alt="${song.title}">
               <div class="min-w-0">
                 <h4 class="text-xs font-bold text-white truncate">${song.title}</h4>
                 <p class="text-[11px] text-[var(--text-secondary)] truncate">${song.artist}</p>
@@ -3192,6 +3258,10 @@
       }, 2800);
     }
 
+    getArtworkFallback(title = 'Música', artist = '') {
+      return generateModernCoverSvg(title, artist);
+    }
+
     formatDuration(seconds) {
       if (!seconds || isNaN(seconds)) return '0:00';
       const mins = Math.floor(seconds / 60);
@@ -3201,6 +3271,7 @@
   }
 
   // Initialize Global Singletons
+  window.getArtworkFallback = generateModernCoverSvg;
   window.audioEngine = new AudioEngine();
   window.app = new MusicFlowApp();
 
