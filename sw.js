@@ -1,19 +1,9 @@
-// MusicFlow Service Worker for fast offline loading on mobile
-const CACHE_NAME = 'musicflow-cache-v3';
-const ASSETS = [
-  './',
-  './index.html',
-  './styles.css',
-  './js/app.js',
-  './manifest.json'
-];
+// MusicFlow Service Worker - Network-First Strategy for Instant Updates
+const CACHE_NAME = 'musicflow-live-v5';
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    }).then(() => self.skipWaiting())
-  );
+  // Activate immediately without waiting for tabs to close
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
@@ -42,14 +32,24 @@ self.addEventListener('fetch', (e) => {
                   url.endsWith('.m4a') || 
                   url.endsWith('.ogg');
 
-  // NEVER intercept media/audio Range requests in service worker
+  // Bypass service worker completely for audio media streams
   if (isMedia) {
     return;
   }
 
+  // Network-First for HTML, JS, CSS, and API requests to guarantee instant updates
   e.respondWith(
-    caches.match(e.request).then((cached) => {
-      return cached || fetch(e.request).catch(() => caches.match('./index.html'));
-    })
+    fetch(e.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, responseClone));
+        }
+        return networkResponse;
+      })
+      .catch(() => {
+        // Fallback to cache when device is offline
+        return caches.match(e.request).then((cached) => cached || caches.match('./index.html'));
+      })
   );
 });
