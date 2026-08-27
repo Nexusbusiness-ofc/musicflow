@@ -37,7 +37,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles.css?v=20260827_09">
+  <link rel="stylesheet" href="styles.css?v=20260827_10">
 </head>
 <body class="bg-[var(--bg-main)] text-[var(--text-primary)] antialiased select-none min-h-screen flex flex-col md:flex-row overflow-x-hidden">
 
@@ -820,7 +820,7 @@
     <!-- PERSISTENT MINI PLAYER BAR -->
     <div id="mini-player" class="fixed bottom-[60px] md:bottom-0 left-0 right-0 md:left-64 z-30 bg-[var(--bg-player)] border-t border-[var(--border-color)] px-4 py-2.5 flex items-center justify-between shadow-2xl transition transform translate-y-0 backdrop-blur-xl">
       <div class="flex items-center gap-3 cursor-pointer flex-1 min-w-0" onclick="app.openFullScreenPlayer()">
-        <img id="mini-cover" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=150&q=80" onerror="this.onerror=null; this.src=app.getArtworkFallback('Music');" class="w-11 h-11 rounded-xl object-cover border border-white/10 shadow-md bg-zinc-900" alt="Mini Cover">
+        <img id="mini-cover" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=150&q=80" onerror="this.onerror=null; this.src=window.getArtworkFallback ? window.getArtworkFallback('Music') : '';" class="w-11 h-11 rounded-xl object-cover border border-white/10 shadow-md bg-zinc-900" alt="Mini Cover">
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2">
             <h4 id="mini-title" class="text-xs md:text-sm font-bold truncate text-white">Nenhuma música a tocar</h4>
@@ -872,7 +872,7 @@
     <!-- Center Album Artwork with Colored Dynamic Glow Reflection -->
     <div class="my-auto py-4 z-10 flex flex-col items-center">
       <div class="relative w-60 h-60 sm:w-72 sm:h-72 md:w-84 md:h-84 rounded-3xl overflow-hidden dynamic-cover-glow border border-white/20 group bg-zinc-900">
-        <img id="fs-cover" src="" onerror="this.onerror=null; this.src=app.getArtworkFallback('MusicFlow');" class="w-full h-full object-cover transition transform duration-700 group-hover:scale-105" alt="Full Cover">
+        <img id="fs-cover" src="" onerror="this.onerror=null; this.src=window.getArtworkFallback ? window.getArtworkFallback('MusicFlow') : '';" class="w-full h-full object-cover transition transform duration-700 group-hover:scale-105" alt="Full Cover">
       </div>
     </div>
 
@@ -1484,11 +1484,11 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- App Main Scripts with Cache Buster -->
-  <script src="js/app.js?v=20260827_09"></script>
+  <script src="js/app.js?v=20260827_10"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=20260827_09')
+        navigator.serviceWorker.register('./sw.js?v=20260827_10')
           .then((reg) => {
             reg.update();
             reg.addEventListener('updatefound', () => {
