@@ -2821,6 +2821,11 @@
         if (fsProgressBar && state.duration > 0) {
           fsProgressBar.max = state.duration;
           fsProgressBar.value = state.currentTime;
+          const percent = ((state.currentTime / state.duration) * 100).toFixed(2);
+          fsProgressBar.style.background = `linear-gradient(to right, #ffffff ${percent}%, rgba(255, 255, 255, 0.2) ${percent}%)`;
+        } else if (fsProgressBar) {
+          fsProgressBar.value = 0;
+          fsProgressBar.style.background = 'rgba(255, 255, 255, 0.2)';
         }
         if (fsCurrentTime) fsCurrentTime.innerText = this.formatDuration(state.currentTime);
         if (fsDurationTime) fsDurationTime.innerText = this.formatDuration(state.duration);
