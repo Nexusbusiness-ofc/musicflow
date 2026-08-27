@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="pt" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MusicFlow — O teu Leitor de Música</title>
+  <meta name="theme-color" content="#09090b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MusicFlow">
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: ['class', '[data-theme="dark"]'],
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              spotify: 'var(--song-primary, #1db954)',
+              spotifyHover: 'var(--song-accent, #1ed760)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-[var(--bg-main)] text-[var(--text-primary)] antialiased select-none min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+
+  <!-- Desktop Left Sidebar -->
+  <aside id="sidebar" class="hidden md:flex flex-col w-64 bg-[var(--bg-sidebar)] border-r border-[var(--border-color)] p-5 fixed top-0 bottom-0 left-0 z-30 justify-between">
+    <div class="space-y-6">
+      <!-- Logo -->
+      <div class="flex items-center gap-3 px-2 cursor-pointer" onclick="app.navigateTo('home')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-spotify via-emerald-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-spotify/20">
+          <i data-lucide="waves" class="w-6 h-6 text-black stroke-[2.5]"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-zinc-200 to-brand-spotify bg-clip-text text-transparent">MusicFlow</h1>
+          <p class="text-[10px] text-[var(--text-muted)] font-semibold tracking-wider uppercase">Audio Experience</p>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="space-y-1 text-sm font-medium">
+        <button onclick="app.navigateTo('home')" class="nav-item active flex items-center gap-3.5 w-full px-3.5 py-3 rounded-xl hover:bg-[var(--bg-card-hover)]" data-target="home">
+          <i data-lucide="home" class="nav-icon w-5 h-5"></i>
+          <span>Início</span>
+        </button>
+
+        <button onclick="app.navigateTo('library')" class="nav-item flex items-center gap-3.5 w-full px-3.5 py-3 rounded-xl hover:bg-[var(--bg-card-hover)]" data-target="library">
+          <i data-lucide="library" class="nav-icon w-5 h-5"></i>
+          <span>Biblioteca</span>
+        </button>
+
+        <button onclick="app.navigateTo('playlists')" class="nav-item flex items-center gap-3.5 w-full px-3.5 py-3 rounded-xl hover:bg-[var(--bg-card-hover)]" data-target="playlists">
+          <i data-lucide="music-2" class="nav-icon w-5 h-5"></i>
+          <span>Playlists</span>
+        </button>
+
+        <button onclick="app.navigateTo('search')" class="nav-item flex items-center gap-3.5 w-full px-3.5 py-3 rounded-xl hover:bg-[var(--bg-card-hover)]" data-target="search">
+          <i data-lucide="search" class="nav-icon w-5 h-5"></i>
+          <span>Pesquisa</span>
+        </button>
+
+        <button onclick="app.navigateTo('history')" class="nav-item flex items-center gap-3.5 w-full px-3.5 py-3 rounded-xl hover:bg-[var(--bg-card-hover)]" data-target="history">
+          <i data-lucide="clock" class="nav-icon w-5 h-5"></i>
+          <span>Histórico</span>
+        </button>
+
+        <button onclick="app.navigateTo('stats')" class="nav-item flex items-center gap-3.5 w-full px-3.5 py-3 rounded-xl hover:bg-[var(--bg-card-hover)]" data-target="stats">
+          <i data-lucide="bar-chart-3" class="nav-icon w-5 h-5"></i>
+          <span>Estatísticas</span>
+        </button>
+
+        <button onclick="app.navigateTo('profile')" class="nav-item flex items-center gap-3.5 w-full px-3.5 py-3 rounded-xl hover:bg-[var(--bg-card-hover)]" data-target="profile">
+          <i data-lucide="user" class="nav-icon w-5 h-5"></i>
+          <span>Perfil</span>
+        </button>
+
+        <button id="nav-btn-admin" onclick="app.navigateTo('admin')" class="nav-item flex items-center gap-3.5 w-full px-3.5 py-3 rounded-xl hover:bg-[var(--bg-card-hover)] text-indigo-400" data-target="admin">
+          <i data-lucide="shield" class="nav-icon w-5 h-5 text-indigo-400"></i>
+          <span>Painel Admin</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Quick Auto-Scan Button & Settings -->
+    <div class="space-y-3 pt-4 border-t border-[var(--border-color)]">
+      <button onclick="app.openImportModal()" class="flex items-center justify-center gap-2 w-full bg-brand-spotify hover:bg-brand-spotifyHover text-black font-bold py-3 rounded-xl transition shadow-lg shadow-brand-spotify/20 text-sm">
+        <i data-lucide="folder-search" class="w-4 h-4"></i>
+        <span>Detetar Músicas MP3</span>
+      </button>
+
+      <button onclick="app.navigateTo('settings')" class="flex items-center gap-3 text-xs text-[var(--text-secondary)] hover:text-white px-2 py-1 transition w-full" data-target="settings">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+        <span>Definições da Aplicação</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main App Workspace -->
+  <main class="flex-1 md:ml-64 flex flex-col min-h-screen pb-32 md:pb-28">
+
+    <!-- Top Header Bar -->
+    <header class="sticky top-0 z-20 glass-panel px-4 py-3 md:px-8 md:py-4 flex items-center justify-between border-b border-[var(--border-color)]">
+      <div class="flex items-center gap-3">
+        <div id="user-avatar-small" class="w-9 h-9 rounded-full bg-zinc-800 bg-cover bg-center border border-zinc-700 cursor-pointer" onclick="app.navigateTo('profile')"></div>
+        <div>
+          <h2 id="user-greeting" class="text-sm md:text-base font-semibold leading-tight">Boa tarde, André</h2>
+          <p class="text-[11px] text-[var(--text-secondary)]">MusicFlow Player</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="app.openImportModal()" class="flex items-center gap-1.5 bg-brand-spotify/15 hover:bg-brand-spotify/25 text-brand-spotify border border-brand-spotify/30 text-xs font-semibold px-3 py-2 rounded-xl transition">
+          <i data-lucide="hard-drive-download" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Detetar MP3</span>
+        </button>
+
+        <button onclick="app.navigateTo('search')" class="p-2.5 rounded-full hover:bg-[var(--bg-card-hover)] transition text-[var(--text-secondary)] hover:text-white">
+          <i data-lucide="search" class="w-5 h-5"></i>
+        </button>
+
+        <button onclick="app.toggleTheme()" class="p-2.5 rounded-full hover:bg-[var(--bg-card-hover)] transition text-[var(--text-secondary)] hover:text-white" title="Alternar Tema">
+          <i id="theme-toggle-icon" data-lucide="moon" class="w-5 h-5"></i>
+        </button>
+
+        <button onclick="app.navigateTo('settings')" class="p-2.5 rounded-full hover:bg-[var(--bg-card-hover)] transition text-[var(--text-secondary)] hover:text-white">
+          <i data-lucide="settings" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Dynamic Content Area -->
+    <section id="content-container" class="p-4 md:p-8 flex-1 max-w-7xl w-full mx-auto">
+      
+      <!-- HOME VIEW -->
+      <div id="view-home" class="space-y-8">
+        
+        <!-- Empty State Hero CTA for Auto-Detection -->
+        <div id="home-empty-cta" class="hidden relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-emerald-950/50 p-6 md:p-10 border border-zinc-800 shadow-2xl text-center space-y-5">
+          <div class="w-16 h-16 rounded-2xl bg-brand-spotify/20 text-brand-spotify flex items-center justify-center mx-auto border border-brand-spotify/30 shadow-lg shadow-brand-spotify/10">
+            <i data-lucide="music-4" class="w-8 h-8"></i>
+          </div>
+          <div class="max-w-md mx-auto space-y-2">
+            <h3 class="text-xl md:text-2xl font-bold tracking-tight text-white">Detetar Músicas do Telemóvel / PC</h3>
+            <p class="text-xs md:text-sm text-zinc-400">
+              O MusicFlow pesquisa e reconhece automaticamente ficheiros de áudio MP3 (&ge; 50KB) transferidos para o teu dispositivo, extraindo metadados, capas e cores fluidas em tempo real.
+            </p>
+          </div>
+          <div class="flex flex-wrap justify-center gap-3 pt-2">
+            <button onclick="app.openImportModal()" class="flex items-center gap-2 bg-brand-spotify hover:bg-brand-spotifyHover text-black font-bold text-sm px-6 py-3.5 rounded-2xl transition shadow-xl shadow-brand-spotify/20 transform hover:scale-105">
+              <i data-lucide="folder-search" class="w-5 h-5"></i>
+              <span>Procurar Músicas no Dispositivo</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Now Playing Dynamic HDR Hero Banner -->
+        <div id="home-now-playing-banner" class="hidden relative overflow-hidden rounded-3xl dynamic-hero-banner p-5 md:p-7 shadow-2xl">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-4 z-10 relative">
+            <div class="flex items-center gap-4 w-full md:w-auto cursor-pointer" onclick="app.openFullScreenPlayer()">
+              <img id="home-np-cover" src="" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover shadow-xl border border-white/15 dynamic-cover-glow" alt="Cover">
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md text-white text-[11px] font-semibold uppercase tracking-wider mb-1 border border-white/10">
+                  <span class="w-2 h-2 rounded-full bg-brand-spotify animate-ping"></span> A Ouvir Agora
+                </span>
+                <h3 id="home-np-title" class="text-base md:text-lg font-bold line-clamp-1 text-white">Título</h3>
+                <p id="home-np-artist" class="text-xs md:text-sm text-zinc-300 line-clamp-1">Artista</p>
+              </div>
+            </div>
+            <button onclick="audioEngine.togglePlay()" class="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-xl transition transform hover:scale-105">
+              <i id="home-np-play-icon" data-lucide="pause" class="w-6 h-6 fill-current"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Recently Played Section -->
+        <div id="home-section-recent" class="hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg md:text-xl font-bold tracking-tight">Ouvidos Recentemente</h3>
+            <button onclick="app.navigateTo('history')" class="text-xs text-[var(--text-muted)] hover:text-brand-spotify font-semibold">Ver tudo</button>
+          </div>
+          <div id="home-recent-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
+        </div>
+
+        <!-- Favorites Section -->
+        <div id="home-section-favorites" class="hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg md:text-xl font-bold tracking-tight">Os teus Favoritos</h3>
+            <button onclick="app.navigateTo('library', 'favorites')" class="text-xs text-[var(--text-muted)] hover:text-brand-spotify font-semibold">Ver tudo</button>
+          </div>
+          <div id="home-favorites-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
+        </div>
+
+        <!-- Albums Section -->
+        <div id="home-section-albums" class="hidden">
+          <h3 class="text-lg md:text-xl font-bold tracking-tight mb-4">Álbuns</h3>
+          <div id="home-albums-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
+        </div>
+
+        <!-- Artists Section -->
+        <div id="home-section-artists" class="hidden">
+          <h3 class="text-lg md:text-xl font-bold tracking-tight mb-4">Artistas</h3>
+          <div id="home-artists-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
+        </div>
+
+        <!-- Playlists Section -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg md:text-xl font-bold tracking-tight">As tuas Playlists</h3>
+            <button onclick="app.openCreatePlaylistModal()" class="text-xs text-brand-spotify hover:underline font-semibold flex items-center gap-1">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Criar Playlist
+            </button>
+          </div>
+          <div id="home-playlists-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
+        </div>
+      </div>
+
+      <!-- LIBRARY VIEW -->
+      <div id="view-library" class="hidden space-y-6">
+        
+        <!-- Library Top Bar & Auto Sync Action -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border-color)] pb-4">
+          <div>
+            <h2 class="text-2xl font-extrabold tracking-tight">A tua Biblioteca</h2>
+            <p class="text-xs text-[var(--text-secondary)]">Músicas MP3 detetadas no teu dispositivo</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="app.openImportModal()" class="flex items-center gap-2 bg-brand-spotify hover:bg-brand-spotifyHover text-black text-xs font-bold px-4 py-2.5 rounded-xl transition shadow shadow-brand-spotify/20">
+              <i data-lucide="folder-search" class="w-4 h-4"></i>
+              <span>Sincronizar Músicas do Dispositivo</span>
+            </button>
+            <button id="view-toggle-btn" onclick="app.toggleLibraryViewMode()" class="p-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-white">
+              <i data-lucide="layout-grid" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Device Sync Banner -->
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900 to-indigo-950/40 border border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-brand-spotify/15 text-brand-spotify flex items-center justify-center flex-shrink-0">
+              <i data-lucide="hard-drive" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-white">Deteção Automática de Áudio MP3 (&ge; 50KB)</h4>
+              <p class="text-[11px] text-zinc-400">Pesquisa e adiciona instantaneamente todas as músicas locais à tua biblioteca.</p>
+            </div>
+          </div>
+          <button onclick="app.triggerDirectoryScan()" class="whitespace-nowrap px-3.5 py-2 bg-zinc-800 hover:bg-zinc-700 text-brand-spotify border border-brand-spotify/30 text-xs font-semibold rounded-xl transition flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Detetar Pasta
+          </button>
+        </div>
+
+        <!-- Tabs / Filters -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar text-xs font-medium">
+          <button onclick="app.filterLibrary('all')" class="lib-tab active px-4 py-2 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] whitespace-nowrap hover:border-brand-spotify" data-tab="all">Todas</button>
+          <button onclick="app.filterLibrary('songs')" class="lib-tab px-4 py-2 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] whitespace-nowrap hover:border-brand-spotify" data-tab="songs">Músicas</button>
+          <button onclick="app.filterLibrary('albums')" class="lib-tab px-4 py-2 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] whitespace-nowrap hover:border-brand-spotify" data-tab="albums">Álbuns</button>
+          <button onclick="app.filterLibrary('artists')" class="lib-tab px-4 py-2 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] whitespace-nowrap hover:border-brand-spotify" data-tab="artists">Artistas</button>
+          <button onclick="app.filterLibrary('genres')" class="lib-tab px-4 py-2 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] whitespace-nowrap hover:border-brand-spotify" data-tab="genres">Géneros</button>
+          <button onclick="app.filterLibrary('favorites')" class="lib-tab px-4 py-2 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] whitespace-nowrap hover:border-brand-spotify" data-tab="favorites">Favoritos</button>
+        </div>
+
+        <!-- Sort Select -->
+        <div class="flex items-center justify-between text-xs text-[var(--text-secondary)]">
+          <span id="library-count-label">0 faixas encontradas</span>
+          <div class="flex items-center gap-2">
+            <span>Ordenar por:</span>
+            <select id="library-sort-select" onchange="app.sortLibrary(this.value)" class="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg px-2.5 py-1 text-xs text-[var(--text-primary)] outline-none">
+              <option value="title">Nome</option>
+              <option value="artist">Artista</option>
+              <option value="album">Álbum</option>
+              <option value="date_added">Data adicionada</option>
+              <option value="play_count">Mais reproduzidas</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Library Grid / List Container -->
+        <div id="library-content-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"></div>
+      </div>
+
+      <!-- SEARCH VIEW -->
+      <div id="view-search" class="hidden space-y-6">
+        <div class="relative max-w-2xl mx-auto">
+          <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-muted)]"></i>
+          <input id="search-input" type="text" oninput="app.handleSearchInput(this.value)" placeholder="Pesquisar por músicas, artistas, álbuns ou géneros..." class="w-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl pl-12 pr-4 py-4 text-sm md:text-base text-white placeholder-zinc-500 focus:border-brand-spotify outline-none transition shadow-lg">
+        </div>
+
+        <div id="search-results-container" class="space-y-8">
+          <div class="text-center py-16 text-[var(--text-muted)]">
+            <i data-lucide="music-4" class="w-12 h-12 mx-auto mb-3 opacity-30"></i>
+            <p class="text-sm">Escreve acima para encontrar na tua biblioteca musical.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLAYLISTS VIEW -->
+      <div id="view-playlists" class="hidden space-y-6">
+        <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-4">
+          <div>
+            <h2 class="text-2xl font-extrabold tracking-tight">Playlists</h2>
+            <p class="text-xs text-[var(--text-secondary)]">Cria e organiza as tuas coleções pessoais</p>
+          </div>
+          <button onclick="app.openCreatePlaylistModal()" class="flex items-center gap-2 bg-brand-spotify hover:bg-brand-spotifyHover text-black text-xs font-bold px-4 py-2.5 rounded-xl transition shadow">
+            <i data-lucide="plus" class="w-4 h-4"></i> Criar Playlist
+          </button>
+        </div>
+        <div id="playlists-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+      </div>
+
+      <!-- PLAYLIST DETAIL VIEW -->
+      <div id="view-playlist-detail" class="hidden space-y-6">
+        <button onclick="app.navigateTo('playlists')" class="flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-white mb-2">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar às Playlists
+        </button>
+
+        <div class="flex flex-col md:flex-row items-center md:items-end gap-6 bg-gradient-to-b from-zinc-800/40 to-transparent p-6 rounded-2xl border border-white/5">
+          <img id="pl-detail-cover" src="" class="w-40 h-40 md:w-48 md:h-48 rounded-2xl object-cover shadow-2xl border border-white/10" alt="Playlist Cover">
+          <div class="space-y-2 text-center md:text-left flex-1">
+            <span class="text-[11px] font-bold uppercase tracking-widest text-brand-spotify">PLAYLIST</span>
+            <h2 id="pl-detail-name" class="text-2xl md:text-4xl font-extrabold tracking-tight">Nome da Playlist</h2>
+            <p id="pl-detail-desc" class="text-xs md:text-sm text-[var(--text-secondary)]">Descrição</p>
+            <p id="pl-detail-count" class="text-xs text-[var(--text-muted)]">0 faixas</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button id="pl-detail-play-btn" onclick="" class="w-14 h-14 rounded-full bg-brand-spotify hover:bg-brand-spotifyHover text-black flex items-center justify-center shadow-xl transition transform hover:scale-105">
+              <i data-lucide="play" class="w-7 h-7 fill-current ml-0.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="pl-detail-songs-list" class="space-y-2"></div>
+      </div>
+
+      <!-- ALBUM DETAIL VIEW -->
+      <div id="view-album-detail" class="hidden space-y-6">
+        <button onclick="app.navigateTo('library', 'albums')" class="flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-white mb-2">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar aos Álbuns
+        </button>
+
+        <div class="flex flex-col md:flex-row items-center md:items-end gap-6 bg-gradient-to-b from-zinc-800/40 to-transparent p-6 rounded-2xl border border-white/5">
+          <img id="alb-detail-cover" src="" class="w-40 h-40 md:w-48 md:h-48 rounded-2xl object-cover shadow-2xl border border-white/10" alt="Album Cover">
+          <div class="space-y-2 text-center md:text-left flex-1">
+            <span class="text-[11px] font-bold uppercase tracking-widest text-brand-spotify">ÁLBUM</span>
+            <h2 id="alb-detail-name" class="text-2xl md:text-4xl font-extrabold tracking-tight">Nome do Álbum</h2>
+            <p id="alb-detail-artist" class="text-xs md:text-sm text-[var(--text-secondary)]">Artista</p>
+            <p id="alb-detail-meta" class="text-xs text-[var(--text-muted)]">0 faixas</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button id="alb-detail-play-btn" onclick="" class="w-14 h-14 rounded-full bg-brand-spotify hover:bg-brand-spotifyHover text-black flex items-center justify-center shadow-xl transition transform hover:scale-105">
+              <i data-lucide="play" class="w-7 h-7 fill-current ml-0.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="alb-detail-songs-list" class="space-y-2"></div>
+      </div>
+
+      <!-- ARTIST DETAIL VIEW -->
+      <div id="view-artist-detail" class="hidden space-y-6">
+        <button onclick="app.navigateTo('library', 'artists')" class="flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)] hover:text-white mb-2">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar aos Artistas
+        </button>
+
+        <div class="flex flex-col md:flex-row items-center md:items-end gap-6 bg-gradient-to-b from-zinc-800/40 to-transparent p-6 rounded-2xl border border-white/5">
+          <img id="art-detail-img" src="" class="w-36 h-36 md:w-44 md:h-44 rounded-full object-cover shadow-2xl border border-white/10" alt="Artist Image">
+          <div class="space-y-2 text-center md:text-left flex-1">
+            <span class="text-[11px] font-bold uppercase tracking-widest text-brand-spotify">ARTISTA</span>
+            <h2 id="art-detail-name" class="text-2xl md:text-4xl font-extrabold tracking-tight">Nome do Artista</h2>
+            <p id="art-detail-meta" class="text-xs text-[var(--text-muted)]">0 músicas no catálogo</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button id="art-detail-play-btn" onclick="" class="w-14 h-14 rounded-full bg-brand-spotify hover:bg-brand-spotifyHover text-black flex items-center justify-center shadow-xl transition transform hover:scale-105">
+              <i data-lucide="play" class="w-7 h-7 fill-current ml-0.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="art-detail-songs-list" class="space-y-2"></div>
+      </div>
+
+      <!-- HISTORY VIEW -->
+      <div id="view-history" class="hidden space-y-6">
+        <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-4">
+          <div>
+            <h2 class="text-2xl font-extrabold tracking-tight">Histórico de Reprodução</h2>
+            <p class="text-xs text-[var(--text-secondary)]">Músicas ouvidas recentemente por ordem cronológica</p>
+          </div>
+          <button onclick="app.clearHistory()" class="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold px-3 py-2 rounded-xl transition border border-red-500/20">
+            <i data-lucide="trash-2" class="w-4 h-4"></i> Limpar Histórico
+          </button>
+        </div>
+        <div id="history-timeline" class="space-y-3"></div>
+      </div>
+
+      <!-- STATS VIEW -->
+      <div id="view-stats" class="hidden space-y-8">
+        <div>
+          <h2 class="text-2xl font-extrabold tracking-tight">As minhas Estatísticas</h2>
+          <p class="text-xs text-[var(--text-secondary)]">Resumo da tua atividade e hábitos de audição no MusicFlow</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl">
+            <p class="text-xs text-[var(--text-muted)] font-semibold">Total de Músicas</p>
+            <h4 id="stat-total-songs" class="text-2xl md:text-3xl font-extrabold text-brand-spotify mt-1">0</h4>
+          </div>
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl">
+            <p class="text-xs text-[var(--text-muted)] font-semibold">Minutos Ouvidos</p>
+            <h4 id="stat-total-minutes" class="text-2xl md:text-3xl font-extrabold text-indigo-400 mt-1">0 min</h4>
+          </div>
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl">
+            <p class="text-xs text-[var(--text-muted)] font-semibold">Playlists Criadas</p>
+            <h4 id="stat-total-playlists" class="text-2xl md:text-3xl font-extrabold text-purple-400 mt-1">0</h4>
+          </div>
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl">
+            <p class="text-xs text-[var(--text-muted)] font-semibold">Sessões Totais</p>
+            <h4 id="stat-total-sessions" class="text-2xl md:text-3xl font-extrabold text-emerald-400 mt-1">1</h4>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-6 rounded-2xl space-y-4">
+            <h3 class="text-base font-bold flex items-center gap-2">
+              <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i> Música Mais Reproduzida
+            </h3>
+            <div id="stat-top-song-card" class="flex items-center gap-4 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800">
+              <p class="text-xs text-[var(--text-muted)]">Nenhuma música ouvida ainda.</p>
+            </div>
+          </div>
+
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-6 rounded-2xl space-y-4">
+            <h3 class="text-base font-bold flex items-center gap-2">
+              <i data-lucide="mic" class="w-5 h-5 text-indigo-400"></i> Artista Mais Ouvido
+            </h3>
+            <div id="stat-top-artist-card" class="flex items-center gap-4 p-3 rounded-xl bg-zinc-900/50 border border-zinc-800">
+              <p class="text-xs text-[var(--text-muted)]">Nenhum artista registado.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE VIEW -->
+      <div id="view-profile" class="hidden space-y-6 max-w-2xl mx-auto">
+        <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-6 md:p-8 rounded-3xl text-center space-y-4 shadow-xl">
+          <div class="relative w-28 h-28 mx-auto">
+            <img id="profile-avatar" src="" class="w-28 h-28 rounded-full object-cover border-4 border-brand-spotify shadow-xl" alt="User Avatar">
+          </div>
+
+          <div>
+            <h2 id="profile-name" class="text-2xl font-bold">André</h2>
+            <p id="profile-email" class="text-xs text-[var(--text-secondary)]">andre@musicflow.app</p>
+          </div>
+
+          <div class="pt-4 flex justify-center gap-3 border-t border-[var(--border-color)]">
+            <button onclick="app.navigateTo('settings')" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold px-4 py-2.5 rounded-xl transition">
+              <i data-lucide="settings" class="w-4 h-4"></i> Definições
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS VIEW -->
+      <div id="view-settings" class="hidden space-y-6 max-w-3xl mx-auto">
+        <h2 class="text-2xl font-extrabold tracking-tight border-b border-[var(--border-color)] pb-4">Definições da Aplicação</h2>
+
+        <div class="space-y-6">
+          <!-- Theme Settings -->
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-4">
+            <h3 class="text-base font-bold flex items-center gap-2">
+              <i data-lucide="palette" class="w-5 h-5 text-brand-spotify"></i> Aparência e Tema
+            </h3>
+            <div class="grid grid-cols-3 gap-3">
+              <button onclick="app.setThemeMode('system')" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900 text-xs font-semibold text-center hover:border-brand-spotify transition">Sistema</button>
+              <button onclick="app.setThemeMode('light')" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900 text-xs font-semibold text-center hover:border-brand-spotify transition">Claro</button>
+              <button onclick="app.setThemeMode('dark')" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900 text-xs font-semibold text-center hover:border-brand-spotify transition">Escuro</button>
+            </div>
+          </div>
+
+          <!-- Playback Settings -->
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-4">
+            <h3 class="text-base font-bold flex items-center gap-2">
+              <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i> Equalizador de Áudio
+            </h3>
+            <div class="space-y-3 text-sm">
+              <div class="flex items-center justify-between py-2 border-b border-zinc-800">
+                <div>
+                  <p class="font-semibold text-xs">Estado do Equalizador</p>
+                  <p class="text-[11px] text-zinc-400">Ativa ou desativa o processamento de áudio</p>
+                </div>
+                <label class="switch">
+                  <input id="settings-eq-toggle" type="checkbox" checked onchange="audioEngine.toggleEqState(this.checked)">
+                  <span class="slider-toggle"></span>
+                </label>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <span>Configuração das 7 Bandas</span>
+                <button onclick="app.openEqualizerModal()" class="text-xs text-brand-spotify font-semibold hover:underline">Abrir Painel</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Library Management -->
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-4">
+            <h3 class="text-base font-bold flex items-center gap-2 text-red-400">
+              <i data-lucide="alert-triangle" class="w-5 h-5"></i> Gestão da Biblioteca
+            </h3>
+            <button onclick="app.clearFullLibrary()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-semibold px-4 py-2.5 rounded-xl transition">
+              Eliminar Todas as Músicas da Biblioteca
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN PANEL VIEW -->
+      <div id="view-admin" class="hidden space-y-6">
+        <div class="border-b border-[var(--border-color)] pb-4">
+          <h2 class="text-2xl font-extrabold tracking-tight text-indigo-400 flex items-center gap-2">
+            <i data-lucide="shield-check" class="w-6 h-6"></i> Painel de Administração
+          </h2>
+          <p class="text-xs text-[var(--text-secondary)]">Métricas e controlo do sistema MusicFlow</p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl">
+            <p class="text-xs text-[var(--text-muted)] font-semibold">Utilizadores Ativos</p>
+            <h4 class="text-2xl font-extrabold text-white mt-1">1</h4>
+          </div>
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl">
+            <p class="text-xs text-[var(--text-muted)] font-semibold">Total de Músicas</p>
+            <h4 id="admin-stat-songs" class="text-2xl font-extrabold text-brand-spotify mt-1">0</h4>
+          </div>
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl">
+            <p class="text-xs text-[var(--text-muted)] font-semibold">Armazenamento Local</p>
+            <h4 class="text-2xl font-extrabold text-purple-400 mt-1">Dispositivo</h4>
+          </div>
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl">
+            <p class="text-xs text-[var(--text-muted)] font-semibold">Erros do Sistema</p>
+            <h4 class="text-2xl font-extrabold text-emerald-400 mt-1">0</h4>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav id="bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-[var(--border-color)] px-2 py-2 flex justify-around items-center">
+      <button onclick="app.navigateTo('home')" class="nav-item active flex flex-col items-center gap-1 p-2 text-[10px]" data-target="home">
+        <i data-lucide="home" class="nav-icon w-5 h-5"></i>
+        <span>Início</span>
+      </button>
+
+      <button onclick="app.navigateTo('library')" class="nav-item flex flex-col items-center gap-1 p-2 text-[10px]" data-target="library">
+        <i data-lucide="library" class="nav-icon w-5 h-5"></i>
+        <span>Biblioteca</span>
+      </button>
+
+      <button onclick="app.navigateTo('playlists')" class="nav-item flex flex-col items-center gap-1 p-2 text-[10px]" data-target="playlists">
+        <i data-lucide="music-2" class="nav-icon w-5 h-5"></i>
+        <span>Playlists</span>
+      </button>
+
+      <button onclick="app.navigateTo('search')" class="nav-item flex flex-col items-center gap-1 p-2 text-[10px]" data-target="search">
+        <i data-lucide="search" class="nav-icon w-5 h-5"></i>
+        <span>Pesquisa</span>
+      </button>
+
+      <button onclick="app.navigateTo('profile')" class="nav-item flex flex-col items-center gap-1 p-2 text-[10px]" data-target="profile">
+        <i data-lucide="user" class="nav-icon w-5 h-5"></i>
+        <span>Perfil</span>
+      </button>
+    </nav>
+
+    <!-- PERSISTENT MINI PLAYER BAR -->
+    <div id="mini-player" class="fixed bottom-[60px] md:bottom-0 left-0 right-0 md:left-64 z-30 bg-[var(--bg-player)] border-t border-[var(--border-color)] px-4 py-2.5 flex items-center justify-between shadow-2xl transition transform translate-y-0 backdrop-blur-xl">
+      <div class="flex items-center gap-3 cursor-pointer flex-1 min-w-0" onclick="app.openFullScreenPlayer()">
+        <img id="mini-cover" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=150&q=80" onerror="this.onerror=null; this.src=app.getArtworkFallback('Music');" class="w-11 h-11 rounded-xl object-cover border border-white/10 shadow-md bg-zinc-900" alt="Mini Cover">
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2">
+            <h4 id="mini-title" class="text-xs md:text-sm font-bold truncate text-white">Nenhuma música a tocar</h4>
+            <div id="mini-eq-indicator" class="hidden items-center gap-0.5">
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+            </div>
+          </div>
+          <p id="mini-artist" class="text-[11px] text-[var(--text-secondary)] truncate">Seleciona uma música da biblioteca</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 md:gap-3">
+        <button onclick="app.openQueueModal()" class="p-2 text-[var(--text-secondary)] hover:text-brand-spotify transition" title="Fila de Reprodução">
+          <i data-lucide="list-music" class="w-4 h-4"></i>
+        </button>
+        <button onclick="app.openLyricsModal()" class="p-2 text-[var(--text-secondary)] hover:text-brand-spotify transition" title="Letras">
+          <i data-lucide="align-left" class="w-4 h-4"></i>
+        </button>
+        <button onclick="audioEngine.togglePlay()" class="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition shadow-lg">
+          <i id="mini-play-icon" data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
+        </button>
+        <button onclick="audioEngine.next()" class="p-2 text-[var(--text-secondary)] hover:text-white transition">
+          <i data-lucide="skip-forward" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- FULL SCREEN PLAYER OVERLAY WITH DYNAMIC HDR GRADIENT MESH -->
+  <div id="fullscreen-player" class="fixed inset-0 z-50 dynamic-hdr-bg flex flex-col justify-between p-4 sm:p-6 md:p-8 transition-transform transform translate-y-full duration-500 overflow-y-auto">
+    <div id="ambient-glow-bg" class="ambient-glow"></div>
+
+    <!-- Top Header -->
+    <div class="flex items-center justify-between z-10 w-full max-w-lg mx-auto">
+      <button onclick="app.closeFullScreenPlayer()" class="p-2 text-white/70 hover:text-white transition">
+        <i data-lucide="chevron-down" class="w-7 h-7"></i>
+      </button>
+      <div class="text-center">
+        <span class="text-[10px] font-bold uppercase tracking-widest text-white/60">A REPRODUZIR</span>
+        <h4 id="fs-album-name" class="text-xs font-semibold text-white truncate max-w-[200px]">Álbum</h4>
+      </div>
+      <button onclick="app.openQueueModal()" class="p-2 text-white/70 hover:text-white transition" title="Fila de Reprodução">
+        <i data-lucide="list-music" class="w-6 h-6"></i>
+      </button>
+    </div>
+
+    <!-- Center Album Artwork with Colored Dynamic Glow Reflection -->
+    <div class="my-auto py-4 z-10 flex flex-col items-center">
+      <div class="relative w-60 h-60 sm:w-72 sm:h-72 md:w-84 md:h-84 rounded-3xl overflow-hidden dynamic-cover-glow border border-white/20 group bg-zinc-900">
+        <img id="fs-cover" src="" onerror="this.onerror=null; this.src=app.getArtworkFallback('MusicFlow');" class="w-full h-full object-cover transition transform duration-700 group-hover:scale-105" alt="Full Cover">
+      </div>
+    </div>
+
+    <!-- Track Info & Controls Container -->
+    <div class="w-full max-w-md mx-auto space-y-4 z-10">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 id="fs-title" class="text-lg md:text-2xl font-extrabold text-white truncate drop-shadow-md">Título da Música</h3>
+          <p id="fs-artist" class="text-xs sm:text-sm text-zinc-300 truncate font-medium">Nome do Artista</p>
+        </div>
+        <button id="fs-fav-btn" onclick="app.toggleCurrentFavorite()" class="p-3 text-white/60 hover:text-red-500 transition">
+          <i data-lucide="heart" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- Seek Bar -->
+      <div class="space-y-1.5">
+        <input id="fs-progress-bar" type="range" min="0" max="100" value="0" oninput="audioEngine.seek(this.value)">
+        <div class="flex justify-between text-[11px] font-mono text-zinc-300">
+          <span id="fs-current-time">0:00</span>
+          <span id="fs-duration-time">0:00</span>
+        </div>
+      </div>
+
+      <!-- Main Audio Controls -->
+      <div class="flex items-center justify-between py-1">
+        <button id="fs-btn-shuffle" onclick="audioEngine.toggleShuffle()" class="p-2 text-white/60 hover:text-white transition">
+          <i data-lucide="shuffle" class="w-5 h-5"></i>
+        </button>
+
+        <button onclick="audioEngine.prev()" class="p-2.5 text-white hover:scale-110 transition">
+          <i data-lucide="skip-back" class="w-6 h-6 fill-current"></i>
+        </button>
+
+        <button onclick="audioEngine.togglePlay()" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white text-black flex items-center justify-center shadow-2xl transition transform hover:scale-105">
+          <i id="fs-play-icon" data-lucide="play" class="w-7 h-7 fill-current ml-0.5"></i>
+        </button>
+
+        <button onclick="audioEngine.next()" class="p-2.5 text-white hover:scale-110 transition">
+          <i data-lucide="skip-forward" class="w-6 h-6 fill-current"></i>
+        </button>
+
+        <button id="fs-btn-repeat" onclick="audioEngine.toggleRepeat()" class="p-2 text-white/60 hover:text-white transition">
+          <i data-lucide="repeat" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- SPOTIFY IN-PLAYER LYRICS PREVIEW CARD (FOLLOWS MUSIC + CLICK TO JUMP) -->
+      <div class="lyrics-preview-card rounded-2xl p-4 space-y-2 cursor-pointer shadow-xl transition" onclick="app.openLyricsModal()">
+        <div class="flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-white uppercase tracking-wider text-[10px]">Letra da Música</span>
+            <span id="fs-lyrics-auto-status" class="text-[9px] px-2 py-0.5 rounded-full bg-white/15 text-white font-bold backdrop-blur-md">Auto</span>
+          </div>
+          <span class="text-[11px] text-white/80 font-semibold flex items-center gap-1 hover:underline">
+            <span>Ecrã Inteiro</span> <i data-lucide="maximize-2" class="w-3 h-3"></i>
+          </span>
+        </div>
+
+        <!-- Real-Time Rolling Active Snippet -->
+        <div id="fs-inline-lyrics-box" class="py-1 min-h-[58px] flex flex-col justify-center space-y-0.5">
+          <p id="fs-inline-prev-line" class="text-[11px] text-white/40 line-clamp-1 truncate font-medium"></p>
+          <p id="fs-inline-active-line" class="text-sm sm:text-base font-bold text-white leading-snug line-clamp-2 drop-shadow">
+            Sem letra disponível para esta música.
+          </p>
+          <p id="fs-inline-next-line" class="text-[11px] text-white/40 line-clamp-1 truncate font-medium"></p>
+        </div>
+      </div>
+
+      <!-- Bottom Tools Bar with Equalizer Badge, Queue & Lyrics -->
+      <div class="flex items-center justify-around pt-2 border-t border-white/10 text-white/70">
+        <!-- Equalizer Button with On/Off indicator -->
+        <button onclick="app.openEqualizerModal()" class="flex flex-col items-center gap-1 text-[10px] hover:text-white transition group">
+          <div class="flex items-center gap-1">
+            <i data-lucide="sliders" class="w-5 h-5"></i>
+            <span id="fs-eq-badge" class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-white/20 text-white">ON</span>
+          </div>
+          <span>Equalizador</span>
+        </button>
+
+        <!-- Spotify-style Synchronized Lyrics Button -->
+        <button onclick="app.openLyricsModal()" class="flex flex-col items-center gap-1 text-[10px] hover:text-white transition">
+          <i data-lucide="align-left" class="w-5 h-5"></i>
+          <span>Letras</span>
+        </button>
+
+        <!-- Playback Queue Button -->
+        <button onclick="app.openQueueModal()" class="flex flex-col items-center gap-1 text-[10px] hover:text-white transition">
+          <i data-lucide="list-music" class="w-5 h-5"></i>
+          <span>Fila</span>
+        </button>
+
+        <button onclick="app.openSleepTimerModal()" class="flex flex-col items-center gap-1 text-[10px] hover:text-white transition">
+          <i data-lucide="timer" class="w-5 h-5"></i>
+          <span id="fs-sleep-label">Temporizador</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALS & DRAWERS -->
+  
+  <!-- EQUALIZER MODAL WITH ACTIVE/INACTIVE SWITCH -->
+  <div id="modal-equalizer" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-3xl p-6 space-y-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-brand-spotify/20 text-brand-spotify flex items-center justify-center">
+            <i data-lucide="sliders" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base md:text-lg font-bold">Equalizador de Áudio</h3>
+            <p class="text-[11px] text-zinc-400">Processamento em tempo real (7 Bandas)</p>
+          </div>
+        </div>
+        <button onclick="app.closeModal('modal-equalizer')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <!-- Equalizer Active / Inactive Switch -->
+      <div class="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-800">
+        <div class="flex items-center gap-2.5">
+          <span id="eq-status-indicator" class="w-2.5 h-2.5 rounded-full bg-brand-spotify animate-pulse"></span>
+          <div>
+            <h4 class="text-xs font-bold text-white">Estado do Equalizador</h4>
+            <p id="eq-status-text" class="text-[10px] text-brand-spotify font-medium">Ativo (Processamento ligado)</p>
+          </div>
+        </div>
+        <label class="switch">
+          <input id="modal-eq-toggle" type="checkbox" checked onchange="audioEngine.toggleEqState(this.checked)">
+          <span class="slider-toggle"></span>
+        </label>
+      </div>
+
+      <!-- Presets & Controls Container -->
+      <div id="eq-controls-panel" class="space-y-5 transition-opacity duration-200">
+        <div class="flex items-center justify-between">
+          <label class="text-xs text-zinc-400 font-medium">Predefinição de Som:</label>
+          <select id="eq-preset-select" onchange="audioEngine.setEqPreset(this.value)" class="bg-zinc-900 border border-zinc-800 text-xs rounded-lg px-3 py-1.5 outline-none text-white focus:border-brand-spotify">
+            <option value="flat">Flat (Neutro)</option>
+            <option value="rock">Rock</option>
+            <option value="pop">Pop</option>
+            <option value="rap">Rap / Hip-Hop</option>
+            <option value="classical">Clássica</option>
+            <option value="jazz">Jazz</option>
+            <option value="bassboost">Bass Boost (Graves)</option>
+            <option value="vocal">Voz / Vocal</option>
+            <option value="dance">Dance / Eletrónica</option>
+          </select>
+        </div>
+
+        <!-- 7 Frequency Band Sliders -->
+        <div class="grid grid-cols-7 gap-2 h-40 items-end text-center py-2">
+          <div class="flex flex-col items-center gap-2 h-full justify-between">
+            <input id="eq-slider-0" type="range" min="-12" max="12" value="0" class="h-28 -rotate-90" oninput="audioEngine.setEqBand(0, parseFloat(this.value))">
+            <span class="text-[10px] text-zinc-400">60Hz</span>
+          </div>
+          <div class="flex flex-col items-center gap-2 h-full justify-between">
+            <input id="eq-slider-1" type="range" min="-12" max="12" value="0" class="h-28 -rotate-90" oninput="audioEngine.setEqBand(1, parseFloat(this.value))">
+            <span class="text-[10px] text-zinc-400">150Hz</span>
+          </div>
+          <div class="flex flex-col items-center gap-2 h-full justify-between">
+            <input id="eq-slider-2" type="range" min="-12" max="12" value="0" class="h-28 -rotate-90" oninput="audioEngine.setEqBand(2, parseFloat(this.value))">
+            <span class="text-[10px] text-zinc-400">400Hz</span>
+          </div>
+          <div class="flex flex-col items-center gap-2 h-full justify-between">
+            <input id="eq-slider-3" type="range" min="-12" max="12" value="0" class="h-28 -rotate-90" oninput="audioEngine.setEqBand(3, parseFloat(this.value))">
+            <span class="text-[10px] text-zinc-400">1kHz</span>
+          </div>
+          <div class="flex flex-col items-center gap-2 h-full justify-between">
+            <input id="eq-slider-4" type="range" min="-12" max="12" value="0" class="h-28 -rotate-90" oninput="audioEngine.setEqBand(4, parseFloat(this.value))">
+            <span class="text-[10px] text-zinc-400">2.4kHz</span>
+          </div>
+          <div class="flex flex-col items-center gap-2 h-full justify-between">
+            <input id="eq-slider-5" type="range" min="-12" max="12" value="0" class="h-28 -rotate-90" oninput="audioEngine.setEqBand(5, parseFloat(this.value))">
+            <span class="text-[10px] text-zinc-400">6kHz</span>
+          </div>
+          <div class="flex flex-col items-center gap-2 h-full justify-between">
+            <input id="eq-slider-6" type="range" min="-12" max="12" value="0" class="h-28 -rotate-90" oninput="audioEngine.setEqBand(6, parseFloat(this.value))">
+            <span class="text-[10px] text-zinc-400">15kHz</span>
+          </div>
+        </div>
+
+        <!-- Bass Boost Slider -->
+        <div class="space-y-2 pt-2 border-t border-zinc-800">
+          <div class="flex justify-between text-xs font-semibold">
+            <span>Reforço de Graves (Bass Boost)</span>
+            <span id="bass-boost-val" class="text-brand-spotify">0 dB</span>
+          </div>
+          <input id="eq-bass-slider" type="range" min="0" max="12" value="0" oninput="audioEngine.setBassBoost(parseFloat(this.value)); document.getElementById('bass-boost-val').innerText = this.value + ' dB';">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPOTIFY-STYLE SYNCHRONIZED KARAOKE LYRICS MODAL WITH DYNAMIC HDR GRADIENT -->
+  <div id="modal-lyrics" class="hidden fixed inset-0 z-50 dynamic-hdr-bg flex flex-col p-4 sm:p-8 max-w-4xl mx-auto shadow-2xl">
+    <div id="lyrics-ambient-bg" class="ambient-glow opacity-45"></div>
+
+    <!-- Lyrics Top Navigation & Control Bar -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10 z-10">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-bold uppercase tracking-widest text-white/70">LETRA SINCRONIZADA</span>
+          <span id="lyrics-synced-badge" class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-white/20 text-white backdrop-blur-md">Karaoke</span>
+        </div>
+        <h3 id="lyrics-track-title" class="text-lg md:text-2xl font-extrabold text-white truncate max-w-[280px] sm:max-w-md drop-shadow">Título</h3>
+        <p id="lyrics-track-artist" class="text-xs text-zinc-300 truncate font-medium">Artista</p>
+      </div>
+
+      <!-- Action Tools: Online Search, File Import, Manual Edit -->
+      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+        <!-- Online Search Button -->
+        <button onclick="app.openOnlineLyricsSearch()" class="flex items-center gap-1.5 px-3 py-1.5 bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs font-semibold rounded-xl transition backdrop-blur-md" title="Pesquisar letra sincronizada na Internet">
+          <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+          <span>Importar Online</span>
+        </button>
+
+        <!-- Import LRC / TXT File -->
+        <label class="flex items-center gap-1.5 px-3 py-1.5 bg-black/40 hover:bg-black/60 border border-white/15 text-white text-xs font-semibold rounded-xl cursor-pointer transition backdrop-blur-md" title="Importar ficheiro .lrc ou .txt">
+          <i data-lucide="file-text" class="w-3.5 h-3.5 text-indigo-300"></i>
+          <span>Ficheiro (.lrc)</span>
+          <input type="file" id="lyrics-file-input" accept=".lrc,.txt" class="hidden" onchange="app.handleLyricsFileInput(this.files)">
+        </label>
+
+        <!-- Manual Edit / Add Button -->
+        <button onclick="app.openLyricsEditor()" class="flex items-center gap-1.5 px-3 py-1.5 bg-black/40 hover:bg-black/60 border border-white/15 text-white text-xs font-semibold rounded-xl transition backdrop-blur-md" title="Escrever ou editar letra com timestamps">
+          <i data-lucide="edit-3" class="w-3.5 h-3.5 text-amber-300"></i>
+          <span>Editar</span>
+        </button>
+
+        <button onclick="app.closeModal('modal-lyrics')" class="p-2 text-white/70 hover:text-white rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+    </div>
+
+    <!-- Scrolling Lyrics Canvas -->
+    <div id="lyrics-scroll-container" class="lyrics-scroll-container flex-1 overflow-y-auto py-12 px-2 sm:px-6 space-y-4 z-10 text-left">
+      <!-- Dynamic lyric lines rendered here -->
+    </div>
+
+    <!-- Bottom Lyrics Mini Control Bar -->
+    <div class="flex items-center justify-between pt-4 border-t border-white/10 text-xs text-white/70 z-10">
+      <span class="text-[11px] flex items-center gap-1.5">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-white"></i>
+        <span>Clica em qualquer verso para saltar instantaneamente para essa parte da música.</span>
+      </span>
+      <button onclick="audioEngine.togglePlay()" class="p-3 rounded-full bg-white text-black hover:scale-105 transition shadow-xl">
+        <i id="lyrics-play-btn" data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- SPOTIFY-STYLE PLAYBACK QUEUE MODAL (WITH REORDERING, DRAG & DROP, ADD TO QUEUE & SELECT) -->
+  <div id="modal-queue" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4">
+    <div class="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-3xl p-5 md:p-6 space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
+      
+      <!-- Queue Header & Actions -->
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-brand-spotify/20 text-brand-spotify flex items-center justify-center">
+            <i data-lucide="list-music" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">Fila de Reprodução</h3>
+            <p id="queue-tracks-count" class="text-[11px] text-zinc-400">0 músicas na fila</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Add to Queue Action Button -->
+          <button onclick="app.openAddToQueueModal()" class="flex items-center gap-1 px-3 py-1.5 bg-brand-spotify/15 hover:bg-brand-spotify/25 text-brand-spotify border border-brand-spotify/30 text-xs font-semibold rounded-xl transition">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Adicionar</span>
+          </button>
+
+          <!-- Clear Upcoming Queue Button -->
+          <button onclick="app.clearUpcomingQueue()" class="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-800 hover:bg-red-500/20 hover:text-red-400 border border-zinc-700 text-xs font-semibold rounded-xl transition text-zinc-400" title="Limpar próximas músicas da fila">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+
+          <button onclick="app.closeModal('modal-queue')" class="p-1.5 text-zinc-400 hover:text-white rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+      </div>
+
+      <!-- Queue Body with 2 Clear Sections: Now Playing & Next In Queue -->
+      <div class="overflow-y-auto flex-1 space-y-4 pr-1">
+        <!-- Section 1: Now Playing -->
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-brand-spotify px-1">A TOCAR AGORA</span>
+          <div id="queue-now-playing-item" class="mt-1.5 p-3 rounded-2xl bg-brand-spotify/10 border border-brand-spotify/30 flex items-center justify-between">
+            <div class="flex items-center gap-3 min-w-0">
+              <img id="q-np-cover" src="" class="w-11 h-11 rounded-xl object-cover border border-white/10" alt="Now Playing">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <h4 id="q-np-title" class="text-xs md:text-sm font-bold text-white truncate">Título</h4>
+                  <div class="flex items-center gap-0.5">
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                  </div>
+                </div>
+                <p id="q-np-artist" class="text-[11px] text-zinc-300 truncate">Artista</p>
+              </div>
+            </div>
+            <span id="q-np-duration" class="text-xs font-mono text-zinc-400">0:00</span>
+          </div>
+        </div>
+
+        <!-- Section 2: Next in Queue with Drag & Reorder -->
+        <div>
+          <div class="flex items-center justify-between px-1 mb-2">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">A SEGUIR NA FILA</span>
+            <span class="text-[10px] text-zinc-500">Arrasta ou usa as setas para reordenar</span>
+          </div>
+          <div id="queue-upcoming-list" class="space-y-1.5">
+            <!-- Dynamic reorderable upcoming queue items -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD TO QUEUE SELECTOR MODAL -->
+  <div id="modal-add-to-queue" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-3xl p-5 md:p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <h3 class="text-base font-bold flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-5 h-5 text-brand-spotify"></i> Adicionar Músicas à Fila
+        </h3>
+        <button onclick="app.closeModal('modal-add-to-queue')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <!-- Library Search Input -->
+      <div class="relative">
+        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400"></i>
+        <input id="add-queue-search" type="text" oninput="app.filterAddToQueueList(this.value)" placeholder="Pesquisar músicas da biblioteca para adicionar à fila..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-10 pr-3 py-2.5 text-xs text-white outline-none focus:border-brand-spotify">
+      </div>
+
+      <!-- Songs Picker List -->
+      <div id="add-queue-songs-list" class="overflow-y-auto flex-1 space-y-2 pr-1">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ONLINE LYRICS SEARCH MODAL -->
+  <div id="modal-online-lyrics" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <h3 class="text-base font-bold flex items-center gap-2">
+          <i data-lucide="globe" class="w-5 h-5 text-brand-spotify"></i> Pesquisar Letra Online
+        </h3>
+        <button onclick="app.closeModal('modal-online-lyrics')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="text-[11px] text-zinc-400 font-semibold uppercase">Música & Artista:</label>
+          <div class="flex gap-2 mt-1">
+            <input id="online-lyrics-search-input" type="text" placeholder="Ex: Nome da Música Artista" class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-brand-spotify">
+            <button onclick="app.fetchOnlineLyrics()" class="px-4 py-2.5 bg-brand-spotify hover:bg-brand-spotifyHover text-black font-bold text-xs rounded-xl transition">
+              Procurar
+            </button>
+          </div>
+        </div>
+
+        <div id="online-lyrics-result-box" class="max-h-60 overflow-y-auto p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-xs space-y-2 text-zinc-300 font-mono">
+          <p class="text-zinc-500 text-center py-6">Clica em "Procurar" para pesquisar letras sincronizadas na base aberta LRCLIB.</p>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-zinc-800">
+        <button onclick="app.closeModal('modal-online-lyrics')" class="px-4 py-2 bg-zinc-800 text-xs font-semibold rounded-xl text-zinc-300">Cancelar</button>
+        <button id="apply-online-lyrics-btn" onclick="app.applyOnlineLyrics()" class="hidden px-4 py-2 bg-brand-spotify hover:bg-brand-spotifyHover text-black text-xs font-bold rounded-xl transition">
+          Aplicar Letra Sincronizada
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANUAL LYRICS EDITOR MODAL -->
+  <div id="modal-lyrics-editor" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-3xl p-6 space-y-4 shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <h3 class="text-base font-bold flex items-center gap-2">
+          <i data-lucide="edit-3" class="w-5 h-5 text-amber-400"></i> Editor de Letras (Formato LRC / Texto)
+        </h3>
+        <button onclick="app.closeModal('modal-lyrics-editor')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <p class="text-[11px] text-zinc-400">
+        Podes colar a letra com timestamps <code class="text-brand-spotify">[mm:ss.xx] Texto</code> para karaoke, ou texto simples.
+      </p>
+
+      <div class="flex items-center gap-2">
+        <button onclick="app.insertCurrentAudioTimestamp()" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-brand-spotify border border-brand-spotify/30 text-xs font-semibold rounded-xl transition flex items-center gap-1.5">
+          <i data-lucide="clock" class="w-3.5 h-3.5"></i> Inserir Tempo Atual (<span id="editor-cur-timestamp">0:00</span>)
+        </button>
+      </div>
+
+      <textarea id="lyrics-editor-textarea" rows="12" class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-xs font-mono text-white outline-none focus:border-brand-spotify resize-none flex-1 leading-relaxed" placeholder="[00:05.20] Primeira linha da música...&#10;[00:10.50] Segunda linha sincronizada..."></textarea>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-zinc-800">
+        <button onclick="app.closeModal('modal-lyrics-editor')" class="px-4 py-2 bg-zinc-800 text-xs font-semibold rounded-xl text-zinc-300">Cancelar</button>
+        <button onclick="app.saveManualLyrics()" class="px-5 py-2 bg-brand-spotify hover:bg-brand-spotifyHover text-black text-xs font-bold rounded-xl transition shadow-lg shadow-brand-spotify/20">
+          Guardar Letra na Música
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sleep Timer Modal -->
+  <div id="modal-sleep-timer" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-sm rounded-3xl p-6 space-y-5">
+      <h3 class="text-lg font-bold flex items-center gap-2">
+        <i data-lucide="timer" class="w-5 h-5 text-brand-spotify"></i> Temporizador de Desligamento
+      </h3>
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="audioEngine.startSleepTimer(5); app.closeModal('modal-sleep-timer')" class="p-3 bg-zinc-900 border border-zinc-800 hover:border-brand-spotify rounded-xl text-xs font-semibold">5 Minutos</button>
+        <button onclick="audioEngine.startSleepTimer(15); app.closeModal('modal-sleep-timer')" class="p-3 bg-zinc-900 border border-zinc-800 hover:border-brand-spotify rounded-xl text-xs font-semibold">15 Minutos</button>
+        <button onclick="audioEngine.startSleepTimer(30); app.closeModal('modal-sleep-timer')" class="p-3 bg-zinc-900 border border-zinc-800 hover:border-brand-spotify rounded-xl text-xs font-semibold">30 Minutos</button>
+        <button onclick="audioEngine.startSleepTimer(60); app.closeModal('modal-sleep-timer')" class="p-3 bg-zinc-900 border border-zinc-800 hover:border-brand-spotify rounded-xl text-xs font-semibold">60 Minutos</button>
+      </div>
+      <button onclick="audioEngine.clearSleepTimer(); app.closeModal('modal-sleep-timer')" class="w-full py-2.5 text-xs font-semibold text-red-400 bg-red-500/10 rounded-xl hover:bg-red-500/20">Desativar Temporizador</button>
+    </div>
+  </div>
+
+  <!-- Import Modal with Full Device MP3 Auto-Scanner -->
+  <div id="modal-import-audio" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-md rounded-3xl p-6 space-y-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div>
+          <h3 class="text-lg font-bold flex items-center gap-2">
+            <i data-lucide="folder-search" class="w-5 h-5 text-brand-spotify"></i> Detetor de Músicas MP3
+          </h3>
+          <p class="text-[11px] text-zinc-400">Pesquisa e adiciona ficheiros de áudio MP3 &ge; 50KB à Biblioteca</p>
+        </div>
+        <button onclick="app.closeModal('modal-import-audio')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="space-y-3">
+        <!-- Direct Directory Scan (Folder Access API) -->
+        <button onclick="app.triggerDirectoryScan()" class="w-full p-4 bg-brand-spotify hover:bg-brand-spotifyHover text-black font-bold rounded-2xl flex items-center justify-center gap-3 transition shadow-lg shadow-brand-spotify/20">
+          <i data-lucide="folder-search" class="w-5 h-5"></i> Detetar Pasta de Músicas do Dispositivo
+        </button>
+
+        <!-- Folder Picker Fallback (webkitdirectory) -->
+        <label class="w-full p-3.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-white text-xs font-semibold rounded-2xl flex items-center justify-center gap-3 cursor-pointer transition">
+          <i data-lucide="folder-open" class="w-4 h-4 text-brand-spotify"></i> Selecionar Pasta Completa (ex: /Music, /Downloads)
+          <input type="file" id="folder-import-input" webkitdirectory directory multiple class="hidden" onchange="app.handleFileInput(this.files)">
+        </label>
+
+        <!-- Multi-File MP3 Picker -->
+        <label class="w-full p-3.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-white text-xs font-semibold rounded-2xl flex items-center justify-center gap-3 cursor-pointer transition">
+          <i data-lucide="file-audio" class="w-4 h-4 text-indigo-400"></i> Selecionar Ficheiros MP3
+          <input type="file" id="file-import-input" multiple accept="audio/mp3,audio/*" class="hidden" onchange="app.handleFileInput(this.files)">
+        </label>
+      </div>
+
+      <div id="import-progress-box" class="hidden p-4 rounded-xl bg-zinc-900 border border-zinc-800 space-y-2">
+        <div class="flex items-center justify-between text-xs font-semibold">
+          <span id="import-progress-text" class="text-brand-spotify">A verificar ficheiros...</span>
+          <span id="import-progress-count" class="text-zinc-400">0/0</span>
+        </div>
+        <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
+          <div id="import-progress-bar" class="bg-brand-spotify h-full w-0 transition-all duration-150"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- App Main Scripts -->
+  <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
