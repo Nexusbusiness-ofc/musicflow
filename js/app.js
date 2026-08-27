@@ -1549,6 +1549,55 @@
       this.completeGoogleAuth(name || email.split('@')[0], email, generatedAvatar);
     }
 
+    async handleAvatarUpload(files) {
+      if (!files || files.length === 0) return;
+      const file = files[0];
+      if (!file.type.startsWith('image/')) {
+        this.showToast('Por favor seleciona um ficheiro de imagem válido (JPG, PNG, WebP).');
+        return;
+      }
+
+      this.showToast('A atualizar a tua foto de perfil...');
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 256;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.88);
+
+          this.user.avatar = compressedBase64;
+          localStorage.setItem('musicflow_user', JSON.stringify(this.user));
+
+          this.updateUserInterfaceHeader();
+          this.showToast('Foto de perfil atualizada com sucesso!');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
     continueAsGuest() {
       localStorage.setItem('musicflow_user_authenticated', 'guest');
       const welcomeOverlay = document.getElementById('modal-auth-welcome');
