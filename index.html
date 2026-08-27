@@ -37,7 +37,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles.css?v=20260827_15">
+  <link rel="stylesheet" href="styles.css?v=20260827_16">
 </head>
 <body class="bg-[var(--bg-main)] text-[var(--text-primary)] antialiased select-none min-h-screen flex flex-col md:flex-row overflow-x-hidden">
 
@@ -333,19 +333,37 @@
           <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar às Playlists
         </button>
 
-        <div class="flex flex-col md:flex-row items-center md:items-end gap-6 bg-gradient-to-b from-zinc-800/40 to-transparent p-6 rounded-2xl border border-white/5">
-          <img id="pl-detail-cover" src="" class="w-40 h-40 md:w-48 md:h-48 rounded-2xl object-cover shadow-2xl border border-white/10" alt="Playlist Cover">
-          <div class="space-y-2 text-center md:text-left flex-1">
+        <div class="flex flex-col md:flex-row items-center md:items-end gap-6 bg-gradient-to-b from-zinc-800/40 to-transparent p-6 rounded-2xl border border-white/5 relative">
+          <!-- Playlist Cover with Change Cover Overlay -->
+          <div class="relative group cursor-pointer w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex-shrink-0" onclick="document.getElementById('playlist-cover-upload-input').click()">
+            <img id="pl-detail-cover" src="" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 bg-zinc-900" alt="Playlist Cover">
+            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1.5 transition text-white text-xs font-semibold">
+              <i data-lucide="camera" class="w-6 h-6 text-brand-spotify"></i>
+              <span>Alterar Capa</span>
+            </div>
+            <input type="file" id="playlist-cover-upload-input" accept="image/*" class="hidden" onchange="app.handlePlaylistCoverUpload(this.files)">
+          </div>
+
+          <div class="space-y-2 text-center md:text-left flex-1 min-w-0">
             <span class="text-[11px] font-bold uppercase tracking-widest text-brand-spotify">PLAYLIST</span>
-            <h2 id="pl-detail-name" class="text-2xl md:text-4xl font-extrabold tracking-tight">Nome da Playlist</h2>
-            <p id="pl-detail-desc" class="text-xs md:text-sm text-[var(--text-secondary)]">Descrição</p>
+            <h2 id="pl-detail-name" class="text-2xl md:text-4xl font-extrabold tracking-tight truncate">Nome da Playlist</h2>
+            <p id="pl-detail-desc" class="text-xs md:text-sm text-[var(--text-secondary)] line-clamp-2">Descrição</p>
             <p id="pl-detail-count" class="text-xs text-[var(--text-muted)]">0 faixas</p>
           </div>
 
-          <div class="flex items-center gap-3">
-            <button id="pl-detail-play-btn" onclick="" class="w-14 h-14 rounded-full bg-brand-spotify hover:bg-brand-spotifyHover text-black flex items-center justify-center shadow-xl transition transform hover:scale-105">
+          <div class="flex flex-wrap items-center gap-3">
+            <button id="pl-detail-play-btn" onclick="" class="w-14 h-14 rounded-full bg-brand-spotify hover:bg-brand-spotifyHover text-black flex items-center justify-center shadow-xl transition transform hover:scale-105" title="Reproduzir Playlist">
               <i data-lucide="play" class="w-7 h-7 fill-current ml-0.5"></i>
             </button>
+            <button onclick="app.openPlaylistAddSongsModal()" class="flex items-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-xl border border-zinc-700 transition" title="Adicionar Músicas da Biblioteca">
+              <i data-lucide="plus" class="w-4 h-4 text-brand-spotify"></i>
+              <span>Adicionar Músicas</span>
+            </button>
+            <label class="flex items-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-xl border border-zinc-700 cursor-pointer transition" title="Alterar Capa da Playlist">
+              <i data-lucide="image" class="w-4 h-4 text-indigo-400"></i>
+              <span>Mudar Capa</span>
+              <input type="file" accept="image/*" class="hidden" onchange="app.handlePlaylistCoverUpload(this.files)">
+            </label>
           </div>
         </div>
 
@@ -879,13 +897,18 @@
     <!-- Track Info & Controls Container -->
     <div class="w-full max-w-md mx-auto space-y-4 z-10">
       <div class="flex items-center justify-between">
-        <div>
+        <div class="min-w-0 flex-1 pr-2">
           <h3 id="fs-title" class="text-lg md:text-2xl font-extrabold text-white truncate drop-shadow-md">Título da Música</h3>
           <p id="fs-artist" class="text-xs sm:text-sm text-zinc-300 truncate font-medium">Nome do Artista</p>
         </div>
-        <button id="fs-fav-btn" onclick="app.toggleCurrentFavorite()" class="p-3 text-white/60 hover:text-red-500 transition">
-          <i data-lucide="heart" class="w-6 h-6"></i>
-        </button>
+        <div class="flex items-center gap-1">
+          <button onclick="if(window.audioEngine.currentSong) app.openAddToPlaylistModal(window.audioEngine.currentSong.id)" class="p-2.5 text-white/70 hover:text-brand-spotify transition" title="Adicionar à Playlist">
+            <i data-lucide="list-plus" class="w-6 h-6"></i>
+          </button>
+          <button id="fs-fav-btn" onclick="app.toggleCurrentFavorite()" class="p-2.5 text-white/70 hover:text-red-500 transition" title="Favorito">
+            <i data-lucide="heart" class="w-6 h-6"></i>
+          </button>
+        </div>
       </div>
 
       <!-- Seek Bar -->
@@ -1480,15 +1503,121 @@
     </div>
   </div>
 
+  <!-- CREATE / EDIT PLAYLIST MODAL WITH COVER PICKER -->
+  <div id="modal-create-playlist" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <h3 class="text-base font-bold flex items-center gap-2">
+          <i data-lucide="music-2" class="w-5 h-5 text-brand-spotify"></i> Nova Playlist
+        </h3>
+        <button onclick="app.closeModal('modal-create-playlist')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <!-- Playlist Cover Selection Box with Live Preview & Upload -->
+      <div class="flex items-center gap-4">
+        <div class="relative w-24 h-24 rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 shadow-md group cursor-pointer flex-shrink-0" onclick="document.getElementById('playlist-modal-cover-file').click()">
+          <img id="modal-playlist-cover-preview" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover" alt="Playlist Cover">
+          <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 transition text-white text-[10px] font-semibold">
+            <i data-lucide="camera" class="w-5 h-5 text-brand-spotify"></i>
+            <span>Escolher</span>
+          </div>
+        </div>
+        <div class="space-y-1.5 flex-1 min-w-0">
+          <p class="text-xs font-bold text-white">Capa da Playlist</p>
+          <p class="text-[11px] text-zinc-400">Escolhe uma foto da galeria ou uma imagem personalizada.</p>
+          <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-white border border-zinc-700 cursor-pointer transition">
+            <i data-lucide="upload" class="w-3.5 h-3.5 text-brand-spotify"></i> Carregar Foto
+            <input type="file" id="playlist-modal-cover-file" accept="image/*" class="hidden" onchange="app.handlePlaylistModalCoverChange(this.files)">
+          </label>
+        </div>
+      </div>
+
+      <!-- Playlist Name & Description -->
+      <div class="space-y-3">
+        <div>
+          <label class="text-[11px] text-zinc-400 font-semibold uppercase">Nome da Playlist *</label>
+          <input id="create-playlist-name" type="text" placeholder="Ex: Minhas Favoritas, Treino, Viagem..." class="w-full mt-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-brand-spotify">
+        </div>
+        <div>
+          <label class="text-[11px] text-zinc-400 font-semibold uppercase">Descrição (Opcional)</label>
+          <input id="create-playlist-desc" type="text" placeholder="Ex: Melhores faixas para o dia a dia" class="w-full mt-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-brand-spotify">
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-2 pt-2 border-t border-zinc-800">
+        <button onclick="app.closeModal('modal-create-playlist')" class="px-4 py-2.5 bg-zinc-800 text-xs font-semibold rounded-xl text-zinc-300">Cancelar</button>
+        <button onclick="app.submitCreatePlaylist()" class="px-5 py-2.5 bg-brand-spotify hover:bg-brand-spotifyHover text-black text-xs font-bold rounded-xl transition shadow">
+          Criar Playlist
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD SONG TO PLAYLIST MODAL -->
+  <div id="modal-add-to-playlist" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-md rounded-3xl p-6 space-y-4 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <h3 class="text-base font-bold flex items-center gap-2">
+          <i data-lucide="list-plus" class="w-5 h-5 text-brand-spotify"></i> Adicionar à Playlist
+        </h3>
+        <button onclick="app.closeModal('modal-add-to-playlist')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <!-- Selected Song Summary -->
+      <div id="add-to-playlist-song-preview" class="p-3 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center gap-3">
+        <img id="add-pl-song-cover" src="" class="w-10 h-10 rounded-lg object-cover bg-zinc-800" alt="Song">
+        <div class="min-w-0 flex-1">
+          <h4 id="add-pl-song-title" class="text-xs font-bold text-white truncate">Título</h4>
+          <p id="add-pl-song-artist" class="text-[11px] text-zinc-400 truncate">Artista</p>
+        </div>
+      </div>
+
+      <!-- Quick Create Playlist Button -->
+      <button onclick="app.openCreatePlaylistModal()" class="w-full py-2.5 px-3 rounded-xl bg-zinc-800/80 hover:bg-zinc-700 text-white text-xs font-semibold border border-zinc-700 flex items-center justify-center gap-2 transition">
+        <i data-lucide="plus" class="w-4 h-4 text-brand-spotify"></i> Criar Nova Playlist
+      </button>
+
+      <!-- User Playlists List -->
+      <div class="space-y-1.5 overflow-y-auto flex-1 pr-1">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 px-1">As Tuas Playlists</span>
+        <div id="add-to-playlist-items" class="space-y-1.5 mt-1">
+          <!-- Dynamic playlist list -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD MULTIPLE SONGS TO OPEN PLAYLIST MODAL -->
+  <div id="modal-playlist-add-songs" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-3xl p-6 space-y-4 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <h3 class="text-base font-bold flex items-center gap-2">
+          <i data-lucide="folder-plus" class="w-5 h-5 text-brand-spotify"></i> Adicionar Músicas à Playlist
+        </h3>
+        <button onclick="app.closeModal('modal-playlist-add-songs')" class="text-zinc-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="relative">
+        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400"></i>
+        <input id="playlist-add-songs-search" type="text" oninput="app.filterPlaylistAddSongsList(this.value)" placeholder="Pesquisar músicas na biblioteca..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-10 pr-3 py-2.5 text-xs text-white outline-none focus:border-brand-spotify">
+      </div>
+
+      <div id="playlist-add-songs-container" class="overflow-y-auto flex-1 space-y-2 pr-1">
+        <!-- Dynamic song selector items -->
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
   <!-- App Main Scripts with Cache Buster -->
-  <script src="js/app.js?v=20260827_15"></script>
+  <script src="js/app.js?v=20260827_16"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=20260827_15')
+        navigator.serviceWorker.register('./sw.js?v=20260827_16')
           .then((reg) => {
             reg.update();
             reg.addEventListener('updatefound', () => {
