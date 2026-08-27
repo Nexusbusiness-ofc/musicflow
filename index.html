@@ -483,32 +483,205 @@
       </div>
 
       <!-- SETTINGS VIEW -->
-      <div id="view-settings" class="hidden space-y-6 max-w-3xl mx-auto">
-        <h2 class="text-2xl font-extrabold tracking-tight border-b border-[var(--border-color)] pb-4">Definições da Aplicação</h2>
+      <div id="view-settings" class="hidden space-y-6 max-w-3xl mx-auto pb-12">
+        <div class="border-b border-[var(--border-color)] pb-4">
+          <h2 class="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2.5">
+            <i data-lucide="settings" class="w-6 h-6 text-brand-spotify"></i> Configurações da Aplicação
+          </h2>
+          <p class="text-xs text-[var(--text-secondary)] mt-1">Personaliza o teu reprodutor, reprodução de áudio e preferências do sistema</p>
+        </div>
 
         <div class="space-y-6">
-          <!-- Theme Settings -->
+          <!-- 1. DEVICE MUSIC SCANNER -->
           <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-4">
-            <h3 class="text-base font-bold flex items-center gap-2">
-              <i data-lucide="palette" class="w-5 h-5 text-brand-spotify"></i> Aparência e Tema
-            </h3>
-            <div class="grid grid-cols-3 gap-3">
-              <button onclick="app.setThemeMode('system')" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900 text-xs font-semibold text-center hover:border-brand-spotify transition">Sistema</button>
-              <button onclick="app.setThemeMode('light')" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900 text-xs font-semibold text-center hover:border-brand-spotify transition">Claro</button>
-              <button onclick="app.setThemeMode('dark')" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900 text-xs font-semibold text-center hover:border-brand-spotify transition">Escuro</button>
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-bold flex items-center gap-2 text-white">
+                <i data-lucide="folder-search" class="w-5 h-5 text-brand-spotify"></i> Detetor de Músicas do Dispositivo
+              </h3>
+              <span id="settings-tracks-counter" class="text-xs text-zinc-400 font-mono">0 faixas na app</span>
+            </div>
+            <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+              Analisa automaticamente o armazenamento do teu telemóvel ou computador (pastas /Music, /Downloads, etc.) e adiciona todas as músicas MP3 (&ge; 50KB) à tua biblioteca.
+            </p>
+            <div class="flex flex-wrap gap-2.5 pt-1">
+              <button onclick="app.triggerDirectoryScan()" class="bg-brand-spotify hover:bg-brand-spotifyHover text-black text-xs font-bold px-5 py-3 rounded-xl transition flex items-center gap-2 shadow-lg">
+                <i data-lucide="scan" class="w-4 h-4"></i> Scanar Músicas do Dispositivo
+              </button>
+              <button onclick="app.openImportModal()" class="bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold px-4 py-3 rounded-xl transition flex items-center gap-2 border border-zinc-700">
+                <i data-lucide="upload" class="w-4 h-4"></i> Selecionar Ficheiros
+              </button>
             </div>
           </div>
 
-          <!-- Playback Settings -->
+          <!-- 2. PLAYBACK: CROSSFADE & GAPLESS -->
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-5">
+            <h3 class="text-base font-bold flex items-center gap-2 text-white">
+              <i data-lucide="disc" class="w-5 h-5 text-indigo-400"></i> Reprodução de Áudio e Transições
+            </h3>
+
+            <!-- Crossfade (Desbotamento) -->
+            <div class="space-y-2.5 border-b border-zinc-800 pb-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-semibold text-xs text-white">Desbotamento entre Músicas (Crossfade)</p>
+                  <p class="text-[11px] text-zinc-400">A faixa atual diminui suavemente enquanto a próxima vai entrando</p>
+                </div>
+                <span id="settings-crossfade-val" class="text-xs font-bold text-brand-spotify font-mono bg-zinc-800 px-2.5 py-1 rounded-lg">Desligado</span>
+              </div>
+              <div class="flex items-center gap-3 pt-1">
+                <span class="text-[10px] text-zinc-500 font-mono">0s</span>
+                <input id="settings-crossfade-slider" type="range" min="0" max="12" step="1" value="0" class="flex-1 accent-brand-spotify cursor-pointer" oninput="app.setCrossfadeDuration(this.value)">
+                <span class="text-[10px] text-zinc-500 font-mono">12s</span>
+              </div>
+            </div>
+
+            <!-- Gapless Playback -->
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+              <div>
+                <p class="font-semibold text-xs text-white">Reprodução Sem Interrupções (Gapless)</p>
+                <p class="text-[11px] text-zinc-400">Elimina pausas e silêncio entre faixas consecutivas</p>
+              </div>
+              <label class="switch">
+                <input id="settings-gapless-toggle" type="checkbox" checked onchange="app.setGaplessPlayback(this.checked)">
+                <span class="slider-toggle"></span>
+              </label>
+            </div>
+
+            <!-- Sleep Timer (Desligamento Automático) -->
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-semibold text-xs text-white">Desligamento Automático (Temporizador)</p>
+                  <p class="text-[11px] text-zinc-400">Pára a reprodução automaticamente após o tempo escolhido</p>
+                </div>
+                <span id="settings-sleep-timer-status" class="text-xs font-bold text-zinc-400 font-mono">Desligado</span>
+              </div>
+              <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1">
+                <button onclick="app.setSleepTimerMinutes(0)" class="py-2 px-2 rounded-xl border border-zinc-800 bg-zinc-900 text-[11px] font-semibold text-center hover:border-brand-spotify transition">Desligado</button>
+                <button onclick="app.setSleepTimerMinutes(15)" class="py-2 px-2 rounded-xl border border-zinc-800 bg-zinc-900 text-[11px] font-semibold text-center hover:border-brand-spotify transition">15 min</button>
+                <button onclick="app.setSleepTimerMinutes(30)" class="py-2 px-2 rounded-xl border border-zinc-800 bg-zinc-900 text-[11px] font-semibold text-center hover:border-brand-spotify transition">30 min</button>
+                <button onclick="app.setSleepTimerMinutes(45)" class="py-2 px-2 rounded-xl border border-zinc-800 bg-zinc-900 text-[11px] font-semibold text-center hover:border-brand-spotify transition">45 min</button>
+                <button onclick="app.setSleepTimerMinutes(60)" class="py-2 px-2 rounded-xl border border-zinc-800 bg-zinc-900 text-[11px] font-semibold text-center hover:border-brand-spotify transition">60 min</button>
+                <button onclick="app.setSleepTimerEndOfSong()" class="py-2 px-2 rounded-xl border border-zinc-800 bg-zinc-900 text-[11px] font-semibold text-center hover:border-brand-spotify transition">Fim da Faixa</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. THEMES FOR THE APP -->
           <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-4">
-            <h3 class="text-base font-bold flex items-center gap-2">
-              <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i> Equalizador de Áudio
+            <h3 class="text-base font-bold flex items-center gap-2 text-white">
+              <i data-lucide="palette" class="w-5 h-5 text-amber-400"></i> Temas Visuais da Aplicação
+            </h3>
+            <p class="text-xs text-[var(--text-secondary)]">Escolhe o teu estilo e paleta de cores favorita:</p>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+              <!-- Spotify Dark -->
+              <button onclick="app.setAppTheme('dark')" class="p-3 rounded-2xl border-2 border-zinc-800 hover:border-brand-spotify bg-[#09090b] text-left transition group space-y-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#1db954] shadow"></span>
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#141418] border border-zinc-700"></span>
+                </div>
+                <p class="text-xs font-bold text-white group-hover:text-brand-spotify">Spotify Dark</p>
+                <p class="text-[10px] text-zinc-500">Preto & Verde</p>
+              </button>
+
+              <!-- Neon Indigo -->
+              <button onclick="app.setAppTheme('indigo')" class="p-3 rounded-2xl border-2 border-zinc-800 hover:border-indigo-500 bg-[#0b0b14] text-left transition group space-y-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#6366f1] shadow"></span>
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#131322] border border-zinc-700"></span>
+                </div>
+                <p class="text-xs font-bold text-white group-hover:text-indigo-400">Neon Indigo</p>
+                <p class="text-[10px] text-zinc-500">Índigo & Noturno</p>
+              </button>
+
+              <!-- Cyberpunk Amber -->
+              <button onclick="app.setAppTheme('amber')" class="p-3 rounded-2xl border-2 border-zinc-800 hover:border-amber-500 bg-[#0c0a07] text-left transition group space-y-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#f59e0b] shadow"></span>
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#18140e] border border-zinc-700"></span>
+                </div>
+                <p class="text-xs font-bold text-white group-hover:text-amber-400">Cyberpunk</p>
+                <p class="text-[10px] text-zinc-500">Âmbar & Ouro</p>
+              </button>
+
+              <!-- Rose Night -->
+              <button onclick="app.setAppTheme('rose')" class="p-3 rounded-2xl border-2 border-zinc-800 hover:border-pink-500 bg-[#0d070b] text-left transition group space-y-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#ec4899] shadow"></span>
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#1a0f16] border border-zinc-700"></span>
+                </div>
+                <p class="text-xs font-bold text-white group-hover:text-pink-400">Rose Night</p>
+                <p class="text-[10px] text-zinc-500">Rosa & Veludo</p>
+              </button>
+
+              <!-- Arctic Light -->
+              <button onclick="app.setAppTheme('light')" class="p-3 rounded-2xl border-2 border-zinc-800 hover:border-emerald-500 bg-[#f8fafc] text-left transition group space-y-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#10b981] shadow"></span>
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#ffffff] border border-zinc-300"></span>
+                </div>
+                <p class="text-xs font-bold text-zinc-900 group-hover:text-emerald-600">Arctic Light</p>
+                <p class="text-[10px] text-zinc-500">Claro & Limpo</p>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4. BACKGROUND PLAYBACK & NOTIFICATIONS -->
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-4">
+            <h3 class="text-base font-bold flex items-center gap-2 text-white">
+              <i data-lucide="smartphone" class="w-5 h-5 text-emerald-400"></i> Segundo Plano & Notificações
+            </h3>
+            
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+              <div>
+                <p class="font-semibold text-xs text-white">Reprodução em Segundo Plano (MediaSession)</p>
+                <p class="text-[11px] text-zinc-400">Controla faixas e capa no ecrã de bloqueio e barra de notificações do telemóvel</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                Ativo Nativo
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-semibold text-xs text-white">Notificações do Sistema</p>
+                <p class="text-[11px] text-zinc-400">Exibe notificação na troca de música ou alertas</p>
+              </div>
+              <label class="switch">
+                <input id="settings-notifications-toggle" type="checkbox" onchange="app.toggleNotifications(this.checked)">
+                <span class="slider-toggle"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 5. LANGUAGE SELECTOR -->
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-4">
+            <h3 class="text-base font-bold flex items-center gap-2 text-white">
+              <i data-lucide="globe" class="w-5 h-5 text-cyan-400"></i> Idioma da Aplicação (Language)
+            </h3>
+            <div class="grid grid-cols-3 gap-3">
+              <button onclick="app.setLanguage('pt')" id="lang-btn-pt" class="p-3 rounded-xl border-2 border-brand-spotify bg-zinc-900 text-xs font-bold text-center text-white transition flex items-center justify-center gap-2">
+                <span>🇵🇹</span> Português
+              </button>
+              <button onclick="app.setLanguage('en')" id="lang-btn-en" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900 text-xs font-semibold text-center text-zinc-400 hover:border-zinc-700 transition flex items-center justify-center gap-2">
+                <span>🇬🇧</span> English
+              </button>
+              <button onclick="app.setLanguage('es')" id="lang-btn-es" class="p-3 rounded-xl border border-zinc-800 bg-zinc-900 text-xs font-semibold text-center text-zinc-400 hover:border-zinc-700 transition flex items-center justify-center gap-2">
+                <span>🇪🇸</span> Español
+              </button>
+            </div>
+          </div>
+
+          <!-- 6. EQUALIZER CONTROLS -->
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-4">
+            <h3 class="text-base font-bold flex items-center gap-2 text-white">
+              <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i> Equalizador de Áudio (7 Bandas + Bass)
             </h3>
             <div class="space-y-3 text-sm">
               <div class="flex items-center justify-between py-2 border-b border-zinc-800">
                 <div>
-                  <p class="font-semibold text-xs">Estado do Equalizador</p>
-                  <p class="text-[11px] text-zinc-400">Ativa ou desativa o processamento de áudio</p>
+                  <p class="font-semibold text-xs text-white">Processamento do Equalizador</p>
+                  <p class="text-[11px] text-zinc-400">Ativa filtros DSP em tempo real ou som direto (Bypass)</p>
                 </div>
                 <label class="switch">
                   <input id="settings-eq-toggle" type="checkbox" checked onchange="audioEngine.toggleEqState(this.checked)">
@@ -516,20 +689,27 @@
                 </label>
               </div>
               <div class="flex items-center justify-between py-2">
-                <span>Configuração das 7 Bandas</span>
-                <button onclick="app.openEqualizerModal()" class="text-xs text-brand-spotify font-semibold hover:underline">Abrir Painel</button>
+                <span class="text-xs text-zinc-300">Presets e Ajuste Manual de Frequências</span>
+                <button onclick="app.openEqualizerModal()" class="text-xs bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded-lg text-brand-spotify font-bold transition">
+                  Abrir Equalizador
+                </button>
               </div>
             </div>
           </div>
 
-          <!-- Library Management -->
+          <!-- 7. LIBRARY MANAGEMENT -->
           <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-4">
             <h3 class="text-base font-bold flex items-center gap-2 text-red-400">
-              <i data-lucide="alert-triangle" class="w-5 h-5"></i> Gestão da Biblioteca
+              <i data-lucide="trash-2" class="w-5 h-5"></i> Gestão e Limpeza de Dados
             </h3>
-            <button onclick="app.clearFullLibrary()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-semibold px-4 py-2.5 rounded-xl transition">
-              Eliminar Todas as Músicas da Biblioteca
-            </button>
+            <div class="flex flex-wrap gap-3">
+              <button onclick="app.clearHistory()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold px-4 py-2.5 rounded-xl transition border border-zinc-700">
+                Limpar Histórico de Reprodução
+              </button>
+              <button onclick="app.clearFullLibrary()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-semibold px-4 py-2.5 rounded-xl transition">
+                Eliminar Todas as Músicas da Biblioteca
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -690,8 +870,9 @@
           <i data-lucide="skip-forward" class="w-6 h-6 fill-current"></i>
         </button>
 
-        <button id="fs-btn-repeat" onclick="audioEngine.toggleRepeat()" class="p-2 text-white/60 hover:text-white transition">
-          <i data-lucide="repeat" class="w-5 h-5"></i>
+        <button id="fs-btn-repeat" onclick="audioEngine.toggleRepeat()" class="p-2 text-white/60 hover:text-white transition relative" title="Repetir">
+          <i id="fs-repeat-icon" data-lucide="repeat" class="w-5 h-5"></i>
+          <span id="fs-repeat-one-badge" class="repeat-one-badge hidden">1</span>
         </button>
       </div>
 
