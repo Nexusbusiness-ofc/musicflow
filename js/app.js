@@ -1103,20 +1103,24 @@
 
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
       <defs>
-        <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id="cover_grad_${Math.abs(hash)}" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="${colorPair[0]}"/>
           <stop offset="100%" stop-color="${colorPair[1]}"/>
         </linearGradient>
       </defs>
-      <rect width="400" height="400" fill="url(#g)"/>
+      <rect width="400" height="400" fill="url(#cover_grad_${Math.abs(hash)})"/>
       <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="20"/>
-      <circle cx="200" cy="200" r="90" fill="rgba(0,0,0,0.25)" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
-      <text x="200" y="195" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-weight="900" font-size="72" fill="#ffffff" text-anchor="middle" dominant-baseline="middle" opacity="0.95">${initial}</text>
-      <text x="200" y="320" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-weight="700" font-size="20" fill="#ffffff" text-anchor="middle" opacity="0.9">${safeTitle}</text>
-      <text x="200" y="348" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-weight="500" font-size="14" fill="rgba(255,255,255,0.7)" text-anchor="middle">${safeArtist}</text>
+      <circle cx="200" cy="200" r="90" fill="rgba(0,0,0,0.3)" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
+      <text x="200" y="200" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-weight="900" font-size="70" fill="#ffffff" text-anchor="middle" dominant-baseline="central">${initial}</text>
+      <text x="200" y="325" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-weight="700" font-size="20" fill="#ffffff" text-anchor="middle">${safeTitle}</text>
+      <text x="200" y="352" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-weight="500" font-size="13" fill="rgba(255,255,255,0.7)" text-anchor="middle">${safeArtist}</text>
     </svg>`;
 
-    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    try {
+      return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+    } catch (e) {
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
   }
 
   function getRandomGradientCover(seed = 'musicflow') {
@@ -1374,9 +1378,17 @@
 
       let needsReseed = this.songs.length === 0;
       for (const song of this.songs) {
+        let changed = false;
         if (starterAudioMap[song.id] && song.audio_url !== starterAudioMap[song.id]) {
           song.audio_url = starterAudioMap[song.id];
           song.duration = 14;
+          changed = true;
+        }
+        if (!song.cover_url || song.cover_url.includes('utf8') || (typeof song.cover_url === 'string' && song.cover_url.startsWith('blob:') && !song.cover_blob)) {
+          song.cover_url = generateModernCoverSvg(song.title, song.artist);
+          changed = true;
+        }
+        if (changed) {
           await updateSongInLibrary(song);
         }
       }
@@ -1917,8 +1929,10 @@
       }
 
       if (this.libraryViewMode === 'grid') {
-        container.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4';
+        container.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4';
         this.renderSongCardsGrid('library-content-list', filtered);
+      } else {
+        container.className = 'space-y-2';
         container.innerHTML = filtered.map((song, idx) => {
           const fallbackSrc = generateModernCoverSvg(song.title, song.artist);
           return `
