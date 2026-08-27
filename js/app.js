@@ -2781,7 +2781,15 @@
 
     openFullScreenPlayer() {
       const fsPlayer = document.getElementById('fullscreen-player');
-      if (fsPlayer) fsPlayer.classList.remove('translate-y-full');
+      if (fsPlayer) {
+        fsPlayer.classList.remove('translate-y-full');
+        if (window.audioEngine.currentSong && window.audioEngine.currentSong.cover_url) {
+          const ambientBg = document.getElementById('ambient-glow-bg');
+          if (ambientBg) {
+            ambientBg.style.backgroundImage = `url(${window.audioEngine.currentSong.cover_url})`;
+          }
+        }
+      }
     }
 
     closeFullScreenPlayer() {
