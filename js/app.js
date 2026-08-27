@@ -3002,6 +3002,25 @@
       }, { passive: true });
     }
 
+    async forceAppUpdate() {
+      this.showToast('A limpar cache e a obter a versão mais recente...');
+      try {
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const reg of registrations) {
+            await reg.unregister();
+          }
+        }
+      } catch(e) {}
+      setTimeout(() => {
+        window.location.href = window.location.origin + window.location.pathname + '?reload=' + Date.now();
+      }, 400);
+    }
+
     showToast(message) {
       const container = document.getElementById('toast-container');
       if (!container) return;
