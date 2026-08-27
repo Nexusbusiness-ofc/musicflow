@@ -252,6 +252,38 @@
     return songIds.map(id => songMap.get(id)).filter(Boolean);
   }
 
+  async function addSongToPlaylist(playlistId, songId) {
+    const allEntries = await idbGetAll('playlist_songs');
+    const existing = allEntries.find(e => e.playlist_id === playlistId && e.song_id === songId);
+    if (existing) return false;
+
+    const playlistEntries = allEntries.filter(e => e.playlist_id === playlistId);
+    const entry = {
+      id: 'pls_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      playlist_id: playlistId,
+      song_id: songId,
+      position: playlistEntries.length
+    };
+    await idbPut('playlist_songs', entry);
+    return true;
+  }
+
+  async function removeSongFromPlaylist(playlistId, songId) {
+    const allEntries = await idbGetAll('playlist_songs');
+    const entry = allEntries.find(e => e.playlist_id === playlistId && e.song_id === songId);
+    if (entry) {
+      await idbDelete('playlist_songs', entry.id);
+      return true;
+    }
+    return false;
+  }
+
+  async function updatePlaylist(playlist) {
+    playlist.updated_at = new Date().toISOString();
+    await idbPut('playlists', playlist);
+    return playlist;
+  }
+
   async function clearUserHistory(userId) {
     await idbClear('history');
   }
@@ -1720,9 +1752,14 @@
               <h4 class="text-xs font-bold text-white truncate">${song.title}</h4>
               <p class="text-[11px] text-[var(--text-secondary)] truncate">${song.artist}</p>
             </div>
-            <button onclick="event.stopPropagation(); app.addToQueueDirect('${song.id}')" class="text-zinc-400 hover:text-brand-spotify p-1 rounded transition" title="Adicionar à Fila">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i>
-            </button>
+            <div class="flex items-center gap-0.5">
+              <button onclick="event.stopPropagation(); app.openAddToPlaylistModal('${song.id}')" class="text-zinc-400 hover:text-brand-spotify p-1 rounded transition" title="Adicionar à Playlist">
+                <i data-lucide="list-plus" class="w-4 h-4"></i>
+              </button>
+              <button onclick="event.stopPropagation(); app.addToQueueDirect('${song.id}')" class="text-zinc-400 hover:text-brand-spotify p-1 rounded transition" title="Adicionar à Fila">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              </button>
+            </div>
           </div>
         </div>
       `).join('');
@@ -1885,6 +1922,9 @@
             </div>
             <div class="flex items-center gap-2 text-xs text-[var(--text-muted)]">
               <span>${this.formatDuration(song.duration)}</span>
+              <button onclick="event.stopPropagation(); app.openAddToPlaylistModal('${song.id}')" class="p-1.5 hover:text-brand-spotify transition" title="Adicionar à Playlist">
+                <i data-lucide="list-plus" class="w-4 h-4"></i>
+              </button>
               <button onclick="event.stopPropagation(); app.addToQueueDirect('${song.id}')" class="p-1.5 hover:text-brand-spotify transition" title="Adicionar à Fila">
                 <i data-lucide="plus-circle" class="w-4 h-4"></i>
               </button>
@@ -1933,7 +1973,15 @@
 
       const listEl = document.getElementById('pl-detail-songs-list');
       if (songs.length === 0) {
-        listEl.innerHTML = `<p class="py-8 text-center text-xs text-[var(--text-muted)]">Esta playlist ainda não contém músicas.</p>`;
+        listEl.innerHTML = `
+          <div class="py-12 text-center space-y-3 bg-zinc-900/30 rounded-2xl border border-zinc-800/60 p-4">
+            <i data-lucide="music-2" class="w-8 h-8 mx-auto text-zinc-600"></i>
+            <p class="text-xs text-[var(--text-muted)]">Esta playlist ainda não contém músicas.</p>
+            <button onclick="app.openPlaylistAddSongsModal()" class="px-4 py-2 bg-brand-spotify hover:bg-brand-spotifyHover text-black text-xs font-bold rounded-xl transition inline-flex items-center gap-1.5 shadow">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Adicionar Músicas
+            </button>
+          </div>
+        `;
       } else {
         listEl.innerHTML = songs.map((song, idx) => `
           <div class="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] border border-[var(--border-color)] group cursor-pointer" onclick="app.playSongDirect('${song.id}')">
@@ -1945,15 +1993,22 @@
                 <p class="text-[11px] text-[var(--text-secondary)] truncate">${song.artist}</p>
               </div>
             </div>
-            <div class="flex items-center gap-2">
-              <button onclick="event.stopPropagation(); app.addToQueueDirect('${song.id}')" class="p-1.5 text-zinc-400 hover:text-brand-spotify transition" title="Adicionar à Fila">
+            <div class="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
+              <span>${this.formatDuration(song.duration)}</span>
+              <button onclick="event.stopPropagation(); app.openAddToPlaylistModal('${song.id}')" class="p-1.5 hover:text-brand-spotify transition" title="Adicionar a outra Playlist">
+                <i data-lucide="list-plus" class="w-4 h-4"></i>
+              </button>
+              <button onclick="event.stopPropagation(); app.addToQueueDirect('${song.id}')" class="p-1.5 hover:text-brand-spotify transition" title="Adicionar à Fila">
                 <i data-lucide="plus-circle" class="w-4 h-4"></i>
               </button>
-              <span class="text-xs font-mono text-[var(--text-muted)]">${this.formatDuration(song.duration)}</span>
+              <button onclick="event.stopPropagation(); app.removeSongFromCurrentPlaylist('${song.id}')" class="p-1.5 hover:text-red-400 transition" title="Remover desta Playlist">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
             </div>
           </div>
         `).join('');
       }
+      if (window.lucide) window.lucide.createIcons();
 
       this.navigateTo('playlist-detail');
     }
@@ -2054,9 +2109,14 @@
                 <h4 class="text-xs font-bold text-white truncate">${song.title}</h4>
                 <p class="text-[11px] text-[var(--text-secondary)] truncate">${song.artist} • ${song.album}</p>
               </div>
-              <button onclick="event.stopPropagation(); app.addToQueueDirect('${song.id}')" class="p-2 text-zinc-400 hover:text-brand-spotify transition" title="Adicionar à Fila">
-                <i data-lucide="plus-circle" class="w-4 h-4"></i>
-              </button>
+              <div class="flex items-center gap-1">
+                <button onclick="event.stopPropagation(); app.openAddToPlaylistModal('${song.id}')" class="p-1.5 text-zinc-400 hover:text-brand-spotify transition" title="Adicionar à Playlist">
+                  <i data-lucide="list-plus" class="w-4 h-4"></i>
+                </button>
+                <button onclick="event.stopPropagation(); app.addToQueueDirect('${song.id}')" class="p-1.5 text-zinc-400 hover:text-brand-spotify transition" title="Adicionar à Fila">
+                  <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                </button>
+              </div>
             </div>
           `).join('')}
         </div>
@@ -3067,14 +3127,253 @@
       });
     }
 
-    async openCreatePlaylistModal() {
-      const name = prompt('Nome da nova Playlist:');
-      if (name) {
-        await createPlaylist(this.user.id, name);
+    compressImageFile(file, maxWidth = 400, maxHeight = 400) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+              }
+            } else {
+              if (height > maxHeight) {
+                width = Math.round((width * maxHeight) / height);
+                height = maxHeight;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.85));
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    openCreatePlaylistModal(prefillName = '', prefillDesc = '', prefillCover = '') {
+      const nameInput = document.getElementById('create-playlist-name');
+      const descInput = document.getElementById('create-playlist-desc');
+      const coverPreview = document.getElementById('modal-playlist-cover-preview');
+
+      if (nameInput) nameInput.value = prefillName;
+      if (descInput) descInput.value = prefillDesc;
+      this.pendingPlaylistCover = prefillCover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80';
+      if (coverPreview) coverPreview.src = this.pendingPlaylistCover;
+
+      document.getElementById('modal-create-playlist').classList.remove('hidden');
+      if (nameInput) nameInput.focus();
+    }
+
+    async handlePlaylistModalCoverChange(files) {
+      if (!files || files.length === 0) return;
+      const file = files[0];
+      try {
+        const compressedBase64 = await this.compressImageFile(file, 400, 400);
+        this.pendingPlaylistCover = compressedBase64;
+        const preview = document.getElementById('modal-playlist-cover-preview');
+        if (preview) preview.src = compressedBase64;
+        this.showToast('Capa da playlist selecionada com sucesso!');
+      } catch (err) {
+        this.showToast('Erro ao processar a foto da capa.');
+      }
+    }
+
+    async submitCreatePlaylist() {
+      const nameInput = document.getElementById('create-playlist-name');
+      const descInput = document.getElementById('create-playlist-desc');
+      const name = nameInput ? nameInput.value.trim() : '';
+      const desc = descInput ? descInput.value.trim() : '';
+
+      if (!name) {
+        this.showToast('Por favor introduz o nome da playlist.');
+        if (nameInput) nameInput.focus();
+        return;
+      }
+
+      const cover = this.pendingPlaylistCover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80';
+      const pl = await createPlaylist(this.user.id, name, desc, cover);
+      await this.loadAppData();
+      this.closeModal('modal-create-playlist');
+      this.renderPlaylistsView();
+      this.showToast(`Playlist "${name}" criada com sucesso!`);
+
+      if (this.pendingSongForPlaylist) {
+        await addSongToPlaylist(pl.id, this.pendingSongForPlaylist);
+        this.showToast(`Música adicionada à nova playlist "${name}"!`);
+        this.pendingSongForPlaylist = null;
+        this.closeModal('modal-add-to-playlist');
+      }
+    }
+
+    async handlePlaylistCoverUpload(files) {
+      if (!files || files.length === 0 || !this.activePlaylist) return;
+      const file = files[0];
+      try {
+        const compressedBase64 = await this.compressImageFile(file, 400, 400);
+        this.activePlaylist.cover_url = compressedBase64;
+        await updatePlaylist(this.activePlaylist);
+        
+        const coverEl = document.getElementById('pl-detail-cover');
+        if (coverEl) coverEl.src = compressedBase64;
+        
         await this.loadAppData();
         this.renderPlaylistsView();
-        this.showToast(`Playlist "${name}" criada com sucesso!`);
+        this.showToast('Capa da playlist atualizada!');
+      } catch (err) {
+        this.showToast('Erro ao atualizar a foto de capa.');
       }
+    }
+
+    async openAddToPlaylistModal(songId) {
+      const song = this.songs.find(s => s.id === songId);
+      if (!song) return;
+
+      this.pendingSongForPlaylist = songId;
+
+      const coverEl = document.getElementById('add-pl-song-cover');
+      const titleEl = document.getElementById('add-pl-song-title');
+      const artistEl = document.getElementById('add-pl-song-artist');
+
+      if (coverEl) coverEl.src = song.cover_url;
+      if (titleEl) titleEl.innerText = song.title;
+      if (artistEl) artistEl.innerText = song.artist;
+
+      const playlists = await getUserPlaylists(this.user.id);
+      const listEl = document.getElementById('add-to-playlist-items');
+
+      if (!listEl) return;
+
+      if (playlists.length === 0) {
+        listEl.innerHTML = `
+          <p class="py-4 text-center text-xs text-zinc-400">Ainda não tens nenhuma playlist criada.</p>
+        `;
+      } else {
+        const allEntries = await idbGetAll('playlist_songs');
+        listEl.innerHTML = playlists.map(pl => {
+          const count = allEntries.filter(e => e.playlist_id === pl.id).length;
+          const isAlreadyIn = allEntries.some(e => e.playlist_id === pl.id && e.song_id === songId);
+
+          return `
+            <div onclick="app.addSongToPlaylistDirect('${pl.id}', '${songId}')" class="flex items-center justify-between p-3 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 cursor-pointer transition group">
+              <div class="flex items-center gap-3 min-w-0">
+                <img src="${pl.cover_url}" class="w-10 h-10 rounded-xl object-cover border border-white/5 bg-zinc-800" alt="${pl.name}">
+                <div class="min-w-0">
+                  <h4 class="text-xs font-bold text-white group-hover:text-brand-spotify transition truncate">${pl.name}</h4>
+                  <p class="text-[11px] text-zinc-400">${count} ${count === 1 ? 'música' : 'músicas'}</p>
+                </div>
+              </div>
+              <div>
+                ${isAlreadyIn 
+                  ? `<span class="text-[10px] px-2.5 py-1 rounded-full bg-brand-spotify/20 text-brand-spotify font-bold flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Adicionada</span>` 
+                  : `<span class="text-xs text-zinc-400 group-hover:text-white transition p-1"><i data-lucide="plus-circle" class="w-5 h-5 text-brand-spotify"></i></span>`
+                }
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('modal-add-to-playlist').classList.remove('hidden');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    async addSongToPlaylistDirect(playlistId, songId) {
+      const added = await addSongToPlaylist(playlistId, songId);
+      const targetPl = this.playlists.find(p => p.id === playlistId);
+      const plName = targetPl ? targetPl.name : 'Playlist';
+
+      if (added) {
+        this.showToast(`Música adicionada à playlist "${plName}"!`);
+      } else {
+        this.showToast(`A música já se encontra na playlist "${plName}".`);
+      }
+
+      this.closeModal('modal-add-to-playlist');
+      if (this.currentView === 'playlist-detail' && this.activePlaylist && this.activePlaylist.id === playlistId) {
+        this.viewPlaylistDetail(playlistId);
+      }
+    }
+
+    async openPlaylistAddSongsModal() {
+      if (!this.activePlaylist) return;
+      this.filterPlaylistAddSongsList('');
+      document.getElementById('modal-playlist-add-songs').classList.remove('hidden');
+    }
+
+    async filterPlaylistAddSongsList(query) {
+      if (!this.activePlaylist) return;
+      const q = query.trim().toLowerCase();
+      const container = document.getElementById('playlist-add-songs-container');
+      if (!container) return;
+
+      const playlistSongs = await getPlaylistSongs(this.activePlaylist.id);
+      const playlistSongIds = new Set(playlistSongs.map(s => s.id));
+
+      const filtered = this.songs.filter(s => 
+        !q || s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q) || s.album.toLowerCase().includes(q)
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="py-8 text-center text-xs text-zinc-400">Nenhuma música encontrada.</p>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(song => {
+        const inPlaylist = playlistSongIds.has(song.id);
+        return `
+          <div class="flex items-center justify-between p-2.5 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 transition">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <img src="${song.cover_url}" class="w-10 h-10 rounded-xl object-cover border border-white/5 bg-zinc-800" alt="${song.title}">
+              <div class="min-w-0 flex-1">
+                <h4 class="text-xs font-bold text-white truncate">${song.title}</h4>
+                <p class="text-[10px] text-zinc-400 truncate">${song.artist}</p>
+              </div>
+            </div>
+            <button onclick="app.toggleSongInActivePlaylist('${song.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${inPlaylist ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' : 'bg-brand-spotify text-black hover:bg-brand-spotifyHover'}">
+              ${inPlaylist ? 'Remover' : '+ Adicionar'}
+            </button>
+          </div>
+        `;
+      }).join('');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    async toggleSongInActivePlaylist(songId) {
+      if (!this.activePlaylist) return;
+      const playlistSongs = await getPlaylistSongs(this.activePlaylist.id);
+      const inPlaylist = playlistSongs.some(s => s.id === songId);
+
+      if (inPlaylist) {
+        await removeSongFromPlaylist(this.activePlaylist.id, songId);
+        this.showToast('Música removida da playlist.');
+      } else {
+        await addSongToPlaylist(this.activePlaylist.id, songId);
+        this.showToast('Música adicionada à playlist!');
+      }
+
+      const searchInput = document.getElementById('playlist-add-songs-search');
+      this.filterPlaylistAddSongsList(searchInput ? searchInput.value : '');
+      this.viewPlaylistDetail(this.activePlaylist.id);
+    }
+
+    async removeSongFromCurrentPlaylist(songId) {
+      if (!this.activePlaylist) return;
+      await removeSongFromPlaylist(this.activePlaylist.id, songId);
+      this.showToast('Música removida da playlist.');
+      this.viewPlaylistDetail(this.activePlaylist.id);
     }
 
     async clearHistory() {
