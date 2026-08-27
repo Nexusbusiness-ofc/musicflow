@@ -1,9 +1,10 @@
 /**
  * MusicFlow - Complete Self-Contained Music Player Engine & Controller
  * Features:
- * 1. Automatic Instant Library with Preloaded Playable Tracks:
- *    - Real-time audio playback engineered for 100% compatibility on Android & iOS mobile browsers.
- *    - Always generates fresh Object URLs for stored Blobs so songs NEVER expire across reloads or PWA restarts.
+ * 1. Automatic Instant Library with Preloaded Self-Hosted Audio Tracks:
+ *    - 100% Reliable Native Audio Playback on Android & iOS mobile devices with zero external CDN dependencies.
+ *    - Automatically migrates and refreshes audio streams to local hosted WAV/MP3 files.
+ *    - Always generates fresh Object URLs for imported device MP3s.
  * 2. Ultra-Fast Resilient Batch MP3 Importer:
  *    - Non-blocking ID3 parser with 250ms duration safety timeout.
  *    - Per-file exception handling and UI-thread yielding so import NEVER stalls or freezes.
@@ -246,149 +247,93 @@
   }
 
   // ==========================================
-  // PROCEDURAL AUDIO SYNTHESIZER (HIGH-COMPATIBILITY 44.1KHZ)
+  // SELF-HOSTED STEREO AUDIO STARTER TRACKS
   // ==========================================
-
-  function generateMelodicAudioBlob(freqBase = 220, chordType = 0) {
-    const sampleRate = 44100;
-    const duration = 28; // 28 seconds
-    const numSamples = sampleRate * duration;
-    const buffer = new Int16Array(numSamples);
-
-    const chordSets = [
-      [0, 7, 9, 5],      // I - V - vi - IV
-      [0, 3, 7, 10],     // Minor 7th
-      [0, 5, 7, 12],     // Suspended
-      [0, 4, 7, 11]      // Major 7th
-    ];
-    const chords = chordSets[chordType % chordSets.length];
-
-    for (let i = 0; i < numSamples; i++) {
-      const t = i / sampleRate;
-      const chordStep = Math.floor((t % 8) / 2);
-      const noteFreq = freqBase * Math.pow(2, chords[chordStep] / 12);
-      
-      let sample = Math.sin(2 * Math.PI * noteFreq * t);
-      sample += 0.45 * Math.sin(2 * Math.PI * (noteFreq * 2) * t);
-      sample += 0.3 * Math.sin(2 * Math.PI * (noteFreq * 0.5) * t);
-      sample *= Math.exp(-2.2 * (t % 1));
-
-      buffer[i] = Math.max(-32768, Math.min(32767, sample * 14000));
-    }
-
-    const wavBuffer = new ArrayBuffer(44 + buffer.length * 2);
-    const view = new DataView(wavBuffer);
-
-    function writeStr(offset, str) {
-      for (let j = 0; j < str.length; j++) view.setUint8(offset + j, str.charCodeAt(j));
-    }
-
-    writeStr(0, 'RIFF');
-    view.setUint32(4, 36 + buffer.length * 2, true);
-    writeStr(8, 'WAVE');
-    writeStr(12, 'fmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true); // PCM
-    view.setUint16(22, 1, true); // Mono
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * 2, true); // Byte rate
-    view.setUint16(32, 2, true); // Block align
-    view.setUint16(34, 16, true); // Bits per sample
-    writeStr(36, 'data');
-    view.setUint32(40, buffer.length * 2, true);
-
-    for (let i = 0; i < buffer.length; i++) {
-      view.setInt16(44 + i * 2, buffer[i], true);
-    }
-
-    return new Blob([wavBuffer], { type: 'audio/wav' });
-  }
 
   async function seedAutomaticStarterTracks(userId) {
     const starters = [
       {
+        id: 'starter_1',
         title: 'VÍCIOS < 3',
         artist: 'Chico da Tina',
         album: 'Minho Rhapsody',
         genre: 'Hip Hop / Trap',
         year: 2024,
-        freq: 220,
-        chord: 0,
-        stream_url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=trap-future-bass-112349.mp3',
+        duration: 32,
+        audio_url: './assets/audio/vicios.wav',
         cover_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=500&q=80',
         lyrics: `[00:00.00] Vícios na noite, rima no sangue\n[00:04.00] Do Minho para o mundo a acelerar\n[00:08.00] Que fusão explosiva é esta!?\n[00:12.00] Chico da Tina a comandar o som\n[00:16.00] Trap português no topo da cena\n[00:20.00] Ouve o flow, sente a energia\n[00:24.00] MusicFlow em alta rotação!`
       },
       {
+        id: 'starter_2',
         title: 'Cafeína',
         artist: 'Plutonio',
         album: 'Sacrifício',
         genre: 'Hip Hop / R&B',
         year: 2024,
-        freq: 261.63,
-        chord: 1,
-        stream_url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=lofi-study-112191.mp3',
+        duration: 32,
+        audio_url: './assets/audio/cafeina.wav',
         cover_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=500&q=80',
         lyrics: `[00:00.00] Madrugada fria com sabor a cafeína\n[00:04.50] Histórias da rua que a vida ensina\n[00:08.00] A mente viaja na melodia\n[00:12.50] Cada batida com nostalgia\n[00:16.00] A voz da alma não se cala\n[00:20.50] O flow corre na sala\n[00:24.00] Mais uma noite até o dia raiar`
       },
       {
+        id: 'starter_3',
         title: 'Devia Ir',
         artist: 'Wet Bed Gang',
         album: 'IV',
         genre: 'Trap / Hip Hop',
         year: 2024,
-        freq: 196,
-        chord: 2,
-        stream_url: 'https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f792cb.mp3?filename=tuesday-glitch-122413.mp3',
+        duration: 32,
+        audio_url: './assets/audio/devia_ir.wav',
         cover_url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=500&q=80',
         lyrics: `[00:00.00] Sei que devia ir mas vou ficar\n[00:04.00] O som tá alto e não quero parar\n[00:08.00] A família unida na vibração\n[00:12.00] Mais uma barra no coração\n[00:16.00] Da margem sul para todo o lado\n[00:20.00] O futuro já tá traçado\n[00:24.00] Wet Bed Gang no controlo!`
       },
       {
+        id: 'starter_4',
         title: 'Tata',
         artist: 'Slow J',
         album: 'Afro Fado',
         genre: 'Alternative / Fado Hip Hop',
         year: 2024,
-        freq: 293.66,
-        chord: 3,
-        stream_url: 'https://cdn.pixabay.com/download/audio/2022/11/06/audio_c1c4b1263d.mp3?filename=titanium-170190.mp3',
+        duration: 32,
+        audio_url: './assets/audio/tata.wav',
         cover_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=500&q=80',
         lyrics: `[00:00.00] Raízes fundas na terra que piso\n[00:04.00] No som da guitarra acho o meu siso\n[00:08.00] Afro Fado em cada respiração\n[00:12.00] Slow J a cantar com emoção\n[00:16.00] Olha p'ra cima e vê a luz\n[00:20.00] A música que nos conduz\n[00:24.00] O amor é a resposta final`
       },
       {
+        id: 'starter_5',
         title: 'Blinding Lights',
         artist: 'The Weeknd',
         album: 'After Hours',
         genre: 'Synthwave / Pop',
         year: 2023,
-        freq: 329.63,
-        chord: 0,
-        stream_url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=the-beat-of-nature-122841.mp3',
+        duration: 32,
+        audio_url: './assets/audio/blinding_lights.wav',
         cover_url: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=500&q=80',
         lyrics: `[00:00.00] I said, ooh, I'm blinded by the lights\n[00:04.50] No, I can't sleep until I feel your touch\n[00:09.00] I said, ooh, I'm drowning in the night\n[00:13.50] Oh, when I'm like this, you're the one I trust\n[00:18.00] Hey, hey, hey\n[00:22.00] Running out of time\n[00:25.00] Blinded by the lights!`
       }
     ];
 
     for (const item of starters) {
-      const audioBlob = generateMelodicAudioBlob(item.freq, item.chord);
       const songData = {
         user_id: userId,
+        id: item.id,
         title: item.title,
         artist: item.artist,
         album: item.album,
         genre: item.genre,
         year: item.year,
         track_number: 1,
-        duration: 28,
-        audio_url: item.stream_url || URL.createObjectURL(audioBlob),
-        audio_blob: audioBlob,
+        duration: item.duration,
+        audio_url: item.audio_url,
         cover_url: item.cover_url,
-        file_format: 'audio/mp3',
-        file_size: audioBlob.size,
-        bitrate: '320 kbps',
+        file_format: 'audio/wav',
+        file_size: 5644800,
+        bitrate: '1411 kbps',
         sample_rate: '44.1 kHz',
         lyrics: item.lyrics
       };
-      await addSongToUserLibrary(songData);
+      await idbPut('songs', songData);
     }
   }
 
@@ -1291,8 +1236,9 @@
     async loadAppData() {
       this.songs = await getSongsForUser(this.user.id);
 
-      // Automatically seed instant starter tracks on first load if library is empty
-      if (this.songs.length === 0) {
+      // Auto migrate and refresh starter tracks to reliable self-hosted paths
+      const hasBrokenUrls = this.songs.some(s => s.audio_url && (s.audio_url.includes('pixabay') || s.audio_url.includes('soundhelix')));
+      if (this.songs.length === 0 || hasBrokenUrls) {
         await seedAutomaticStarterTracks(this.user.id);
         this.songs = await getSongsForUser(this.user.id);
       }
