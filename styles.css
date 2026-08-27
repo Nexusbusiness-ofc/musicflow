@@ -1,0 +1,373 @@
+/* MusicFlow - Modern Dynamic HDR Spotify-Style CSS */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg-main: #09090b;
+  --bg-card: #141418;
+  --bg-card-hover: #1c1c22;
+  --bg-sidebar: #0d0d11;
+  --bg-player: #121216;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --accent-color: #1db954;
+  --accent-hover: #1ed760;
+  --accent-glow: rgba(29, 185, 84, 0.25);
+  --border-color: #27272a;
+  --glass-bg: rgba(20, 20, 24, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+
+  /* Dynamic Song Colors (Auto-Extracted from Artwork) */
+  --song-primary: #1db954;
+  --song-secondary: #1e3a8a;
+  --song-accent: #10b981;
+  --song-dark: #0a0a0f;
+  --song-glow: rgba(29, 185, 84, 0.35);
+  --audio-energy: 1.0;
+}
+
+[data-theme="light"] {
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --bg-sidebar: #f1f5f9;
+  --bg-player: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --accent-color: #10b981;
+  --accent-hover: #059669;
+  --accent-glow: rgba(16, 185, 129, 0.2);
+  --border-color: #e2e8f0;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  user-select: none;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Glassmorphism & Cards */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+}
+
+.music-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.music-card:hover {
+  background-color: var(--bg-card-hover);
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
+}
+
+.music-card:hover .play-btn-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.play-btn-overlay {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.25s ease;
+}
+
+/* Equalizer Bars Animation */
+.eq-bar {
+  display: inline-block;
+  width: 3px;
+  background-color: var(--song-primary, var(--accent-color));
+  border-radius: 2px;
+  animation: eqBounce 1.2s infinite ease-in-out alternate;
+}
+
+.eq-bar:nth-child(1) { height: 16px; animation-delay: 0.1s; }
+.eq-bar:nth-child(2) { height: 22px; animation-delay: 0.3s; }
+.eq-bar:nth-child(3) { height: 12px; animation-delay: 0.5s; }
+.eq-bar:nth-child(4) { height: 18px; animation-delay: 0.2s; }
+
+@keyframes eqBounce {
+  0% { height: 4px; }
+  100% { height: 24px; }
+}
+
+/* Dynamic Custom Range Slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--song-primary, var(--accent-color));
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.3s ease;
+  box-shadow: 0 0 14px var(--song-glow, var(--accent-glow));
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(1.35);
+}
+
+/* Active Nav Links */
+.nav-item {
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover, .nav-item.active {
+  color: var(--text-primary);
+}
+
+.nav-item.active .nav-icon {
+  color: var(--song-primary, var(--accent-color));
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  bottom: 84px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  animation: toastIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ==========================================
+   DYNAMIC HDR MESH GRADIENTS & AMBIENT GLOW
+   ========================================== */
+.dynamic-hdr-bg {
+  position: relative;
+  background: radial-gradient(circle at 15% 15%, var(--song-primary, #1db954) 0%, transparent 65%),
+              radial-gradient(circle at 85% 85%, var(--song-secondary, #3b82f6) 0%, transparent 65%),
+              radial-gradient(circle at 50% 40%, var(--song-accent, #8b5cf6) 0%, transparent 70%),
+              linear-gradient(180deg, var(--song-dark, #09090b) 0%, #050507 100%);
+  background-size: 160% 160%;
+  animation: fluidHdrMesh 16s ease-in-out infinite alternate;
+}
+
+@keyframes fluidHdrMesh {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 50% 100%; }
+}
+
+.ambient-glow {
+  position: absolute;
+  top: -25%;
+  left: -25%;
+  right: -25%;
+  height: 80%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(90px) opacity(0.45) saturate(1.8);
+  pointer-events: none;
+  z-index: 0;
+  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(var(--audio-energy, 1));
+}
+
+.dynamic-cover-glow {
+  box-shadow: 0 25px 60px -15px var(--song-glow, rgba(0, 0, 0, 0.7)), 0 0 40px -10px var(--song-primary, rgba(29, 185, 84, 0.25));
+  transition: box-shadow 0.6s ease, transform 0.6s ease;
+}
+
+.dynamic-hero-banner {
+  background: radial-gradient(circle at 90% 10%, var(--song-primary, #1db954) 0%, transparent 60%),
+              radial-gradient(circle at 10% 90%, var(--song-secondary, #4338ca) 0%, transparent 60%),
+              linear-gradient(135deg, #18181b 0%, #09090b 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: background 0.8s ease, border-color 0.8s ease;
+}
+
+/* ==========================================
+   SPOTIFY-STYLE SYNCHRONIZED KARAOKE LYRICS
+   ========================================== */
+.lyrics-scroll-container {
+  scroll-behavior: smooth;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%);
+}
+
+.lyric-line {
+  font-size: 1.25rem;
+  line-height: 1.65;
+  color: #71717a;
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 16px;
+  text-align: left;
+  user-select: none;
+}
+
+@media (min-width: 640px) {
+  .lyric-line {
+    font-size: 1.55rem;
+    line-height: 1.8;
+  }
+}
+
+.lyric-line:hover {
+  color: #f4f4f5;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lyric-line-active {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 1.7rem !important;
+  transform: scale(1.035);
+  text-shadow: 0 0 28px var(--song-glow, rgba(29, 185, 84, 0.7));
+  background: rgba(255, 255, 255, 0.07);
+  border-left: 4px solid var(--song-primary, var(--accent-color));
+}
+
+@media (min-width: 640px) {
+  .lyric-line-active {
+    font-size: 2.05rem !important;
+  }
+}
+
+/* Spotify In-Player Lyrics Card */
+.lyrics-preview-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(18, 18, 22, 0.85));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px -10px var(--song-glow, rgba(0, 0, 0, 0.5));
+  transition: all 0.3s ease;
+}
+
+.lyrics-preview-card:hover {
+  border-color: var(--song-primary, var(--accent-color));
+  transform: translateY(-2px);
+}
+
+/* ==========================================
+   QUEUE REORDERING & DRAG-AND-DROP STYLES
+   ========================================== */
+.queue-item {
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.queue-item.dragging {
+  opacity: 0.35;
+  transform: scale(0.98);
+  border: 1px dashed var(--song-primary, #1db954);
+}
+
+.queue-item.drag-over {
+  border-color: var(--song-primary, #1db954);
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(2px);
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider-toggle {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #3f3f46;
+  transition: .3s;
+  border-radius: 24px;
+}
+.slider-toggle:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+input:checked + .slider-toggle {
+  background-color: var(--song-primary, var(--accent-color));
+}
+input:checked + .slider-toggle:before {
+  transform: translateX(20px);
+}
