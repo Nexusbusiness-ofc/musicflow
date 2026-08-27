@@ -466,3 +466,29 @@ input:checked + .slider-toggle {
 input:checked + .slider-toggle:before {
   transform: translateX(20px);
 }
+
+/* Google Auth Welcome Overlay & Card */
+.auth-overlay {
+  background: radial-gradient(circle at 50% 30%, rgba(29, 185, 84, 0.22) 0%, rgba(12, 12, 16, 0.98) 60%, #09090b 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.google-btn {
+  background: #ffffff;
+  color: #1f1f1f;
+  font-family: 'Plus Jakarta Sans', Roboto, sans-serif;
+  font-weight: 700;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.google-btn:hover {
+  background: #f8f9fa;
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.18);
+  transform: translateY(-2px);
+}
+
+.google-btn:active {
+  transform: scale(0.98);
+}
