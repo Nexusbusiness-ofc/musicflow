@@ -36,8 +36,8 @@
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
+  <!-- Custom Stylesheet with Cache Buster -->
+  <link rel="stylesheet" href="styles.css?v=20260827_05">
 </head>
 <body class="bg-[var(--bg-main)] text-[var(--text-primary)] antialiased select-none min-h-screen flex flex-col md:flex-row overflow-x-hidden">
 
@@ -697,7 +697,20 @@
             </div>
           </div>
 
-          <!-- 7. LIBRARY MANAGEMENT -->
+          <!-- 7. APP UPDATE & CACHE PURGE -->
+          <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-4">
+            <h3 class="text-base font-bold flex items-center gap-2 text-brand-spotify">
+              <i data-lucide="refresh-cw" class="w-5 h-5"></i> Atualização & Versão da Aplicação
+            </h3>
+            <p class="text-xs text-[var(--text-secondary)] leading-relaxed">
+              Clica abaixo para forçar o telemóvel a descarregar imediatamente a versão mais recente com temas, crossfade, temporizador e todas as novas definições.
+            </p>
+            <button onclick="app.forceAppUpdate()" class="w-full sm:w-auto bg-brand-spotify hover:bg-brand-spotifyHover text-black text-xs font-bold px-6 py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg">
+              <i data-lucide="sparkles" class="w-4 h-4"></i> Forçar Atualização & Limpar Cache
+            </button>
+          </div>
+
+          <!-- 8. LIBRARY MANAGEMENT -->
           <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-4">
             <h3 class="text-base font-bold flex items-center gap-2 text-red-400">
               <i data-lucide="trash-2" class="w-5 h-5"></i> Gestão e Limpeza de Dados
@@ -1302,12 +1315,35 @@
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- App Main Scripts -->
-  <script src="js/app.js"></script>
+  <!-- App Main Scripts with Cache Buster -->
+  <script src="js/app.js?v=20260827_05"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        navigator.serviceWorker.register('./sw.js?v=20260827_05')
+          .then((reg) => {
+            reg.update();
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('New version found, updating...');
+                    window.location.reload();
+                  }
+                });
+              }
+            });
+          })
+          .catch(() => {});
+      });
+
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
       });
     }
   </script>
