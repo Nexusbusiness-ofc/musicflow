@@ -129,27 +129,29 @@
   }
 
   function getCurrentUser() {
-    let user = localStorage.getItem('musicflow_user');
-    if (!user) {
-      const defaultUser = {
-        id: 'usr_andre',
-        name: 'André',
-        email: 'andre@musicflow.app',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-        role: 'admin',
-        theme: 'dark',
-        language: 'pt',
-        createdAt: new Date().toISOString()
-      };
-      localStorage.setItem('musicflow_user', JSON.stringify(defaultUser));
-      return defaultUser;
+    let userStr = localStorage.getItem('musicflow_user');
+    if (userStr) {
+      try {
+        return JSON.parse(userStr);
+      } catch (e) {}
     }
-    return JSON.parse(user);
+    const defaultUser = {
+      id: 'usr_google_default',
+      name: 'André',
+      email: 'andre.nexus.business@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+      role: 'user',
+      auth_provider: 'google',
+      theme: 'dark',
+      language: 'pt',
+      createdAt: new Date().toISOString()
+    };
+    return defaultUser;
   }
 
   async function getSongsForUser(userId) {
     const all = await idbGetAll('songs');
-    return all.filter(s => s.user_id === userId).map(song => {
+    return all.map(song => {
       // ALWAYS generate a fresh, active ObjectURL from stored audio blob
       if (song.audio_blob) {
         try {
@@ -1311,6 +1313,7 @@
       if (notifToggle) notifToggle.checked = localStorage.getItem('musicflow_notifications') === 'true';
 
       await this.loadAppData();
+      this.checkFirstTimeAuth();
       this.updateUserInterfaceHeader();
       this.bindAudioSubscriptions();
       this.bindKeyboardShortcuts();
@@ -1473,6 +1476,97 @@
       if (this.user.role === 'admin') {
         const adminNavBtn = document.getElementById('nav-btn-admin');
         if (adminNavBtn) adminNavBtn.classList.remove('hidden');
+      }
+
+      const authBadge = document.getElementById('profile-auth-badge');
+      if (authBadge) {
+        if (this.user.auth_provider === 'google') {
+          authBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Conta Google Conectada`;
+          authBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+        } else {
+          authBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-zinc-400"></span> Modo Convidado / Offline`;
+          authBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-zinc-800 text-zinc-400 border border-zinc-700';
+        }
+      }
+    }
+
+    checkFirstTimeAuth() {
+      const isAuth = localStorage.getItem('musicflow_user_authenticated');
+      const welcomeOverlay = document.getElementById('modal-auth-welcome');
+      if (!isAuth) {
+        if (welcomeOverlay) welcomeOverlay.classList.remove('hidden');
+      } else {
+        if (welcomeOverlay) welcomeOverlay.classList.add('hidden');
+      }
+    }
+
+    openGoogleAuthModal() {
+      document.getElementById('modal-google-picker').classList.remove('hidden');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    async completeGoogleAuth(name, email, avatar) {
+      const userId = 'usr_google_' + (email ? btoa(email).replace(/=/g, '').slice(0, 16) : Date.now());
+      const googleUser = {
+        id: userId,
+        name: name || 'Utilizador Google',
+        email: email || 'utilizador@gmail.com',
+        avatar: avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+        role: 'user',
+        auth_provider: 'google',
+        theme: localStorage.getItem('musicflow_app_theme') || 'dark',
+        language: localStorage.getItem('musicflow_lang') || 'pt',
+        createdAt: new Date().toISOString()
+      };
+
+      localStorage.setItem('musicflow_user', JSON.stringify(googleUser));
+      localStorage.setItem('musicflow_user_authenticated', 'true');
+      this.user = googleUser;
+
+      this.closeModal('modal-google-picker');
+      const welcomeOverlay = document.getElementById('modal-auth-welcome');
+      if (welcomeOverlay) welcomeOverlay.classList.add('hidden');
+
+      this.updateUserInterfaceHeader();
+      await this.loadAppData();
+      this.showToast(`Sessão iniciada com a Google (${this.user.name})!`);
+      this.navigateTo('home');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    handleCustomGoogleLogin() {
+      const nameInput = document.getElementById('custom-google-name');
+      const emailInput = document.getElementById('custom-google-email');
+      const name = nameInput ? nameInput.value.trim() : '';
+      const email = emailInput ? emailInput.value.trim() : '';
+
+      if (!email || !email.includes('@')) {
+        this.showToast('Por favor introduz um e-mail Google/Gmail válido.');
+        return;
+      }
+
+      const generatedAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name || email)}&background=1db954&color=000&bold=true`;
+      this.completeGoogleAuth(name || email.split('@')[0], email, generatedAvatar);
+    }
+
+    continueAsGuest() {
+      localStorage.setItem('musicflow_user_authenticated', 'guest');
+      const welcomeOverlay = document.getElementById('modal-auth-welcome');
+      if (welcomeOverlay) welcomeOverlay.classList.add('hidden');
+      this.showToast('Bem-vindo ao MusicFlow (Modo Offline)');
+    }
+
+    logout() {
+      if (confirm('Desejas terminar a sessão da tua conta Google no MusicFlow?')) {
+        localStorage.removeItem('musicflow_user_authenticated');
+        localStorage.removeItem('musicflow_user');
+        this.user = getCurrentUser();
+        window.audioEngine.pause();
+        const welcomeOverlay = document.getElementById('modal-auth-welcome');
+        if (welcomeOverlay) welcomeOverlay.classList.remove('hidden');
+        this.updateUserInterfaceHeader();
+        this.showToast('Sessão terminada.');
+        if (window.lucide) window.lucide.createIcons();
       }
     }
 
