@@ -503,3 +503,163 @@ input:checked + .slider-toggle:before {
 .google-btn:active {
   transform: scale(0.98);
 }
+
+/* ==========================================================================
+   DYNAMIC HDR COLOR MESH & ADVANCED GLASSMORPHISM PLAYER EXPERIENCE
+   ========================================================================== */
+
+/* HDR Ambient Glowing Mesh Background */
+.player-hdr-mesh {
+  background: radial-gradient(circle at 50% 10%, var(--hdr-color-1, rgba(30, 41, 59, 0.9)) 0%, #09090b 80%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.hdr-glow-mesh-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hdr-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.75;
+  mix-blend-mode: screen;
+  animation: hdrOrbFloat 14s ease-in-out infinite alternate;
+}
+
+.hdr-orb.orb-1 {
+  top: -10%;
+  left: 10%;
+  width: 380px;
+  height: 380px;
+  background: var(--hdr-orb-1, radial-gradient(circle, #6366f1 0%, rgba(99, 102, 241, 0) 70%));
+  animation-duration: 12s;
+}
+
+.hdr-orb.orb-2 {
+  top: 35%;
+  right: -10%;
+  width: 420px;
+  height: 420px;
+  background: var(--hdr-orb-2, radial-gradient(circle, #ec4899 0%, rgba(236, 72, 153, 0) 70%));
+  animation-duration: 16s;
+  animation-delay: -4s;
+}
+
+.hdr-orb.orb-3 {
+  bottom: 5%;
+  left: 20%;
+  width: 360px;
+  height: 360px;
+  background: var(--hdr-orb-3, radial-gradient(circle, #10b981 0%, rgba(16, 185, 129, 0) 70%));
+  animation-duration: 18s;
+  animation-delay: -8s;
+}
+
+@keyframes hdrOrbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -30px) scale(1.15); }
+  100% { transform: translate(-30px, 35px) scale(0.9); }
+}
+
+/* Glassmorphic Player Card */
+.glass-player-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 
+    0 24px 48px -12px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 28px;
+  padding: 1.25rem 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glass Pill Header */
+.glass-header-pill {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+  padding: 6px 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Glass Cover Halo Frame */
+.glass-cover-halo {
+  position: relative;
+  padding: 8px;
+  border-radius: 36px;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 20px 50px -10px var(--hdr-shadow-glow, rgba(0, 0, 0, 0.7)),
+    0 0 40px var(--hdr-accent-glow, rgba(255, 255, 255, 0.15)),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+/* Glass Lyrics Preview */
+.glass-lyrics-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.25s ease;
+}
+
+.glass-lyrics-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+}
+
+/* Glass Bottom Action Button */
+.glass-tool-btn {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+}
+
+.glass-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Glass Play/Pause Button */
+.glass-play-btn {
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+  color: #000000;
+  box-shadow: 
+    0 12px 28px -4px var(--hdr-shadow-glow, rgba(255, 255, 255, 0.4)),
+    0 0 20px rgba(255, 255, 255, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-play-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 
+    0 16px 36px -4px var(--hdr-shadow-glow, rgba(255, 255, 255, 0.6)),
+    0 0 30px rgba(255, 255, 255, 0.5);
+}
+
+.glass-play-btn:active {
+  transform: scale(0.96);
+}
