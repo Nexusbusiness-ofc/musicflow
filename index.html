@@ -37,7 +37,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles.css?v=20260827_06">
+  <link rel="stylesheet" href="styles.css?v=20260827_07">
 </head>
 <body class="bg-[var(--bg-main)] text-[var(--text-primary)] antialiased select-none min-h-screen flex flex-col md:flex-row overflow-x-hidden">
 
@@ -464,19 +464,34 @@
 
       <!-- PROFILE VIEW -->
       <div id="view-profile" class="hidden space-y-6 max-w-2xl mx-auto">
-        <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-6 md:p-8 rounded-3xl text-center space-y-4 shadow-xl">
+        <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-6 md:p-8 rounded-3xl text-center space-y-5 shadow-xl">
           <div class="relative w-28 h-28 mx-auto">
             <img id="profile-avatar" src="" class="w-28 h-28 rounded-full object-cover border-4 border-brand-spotify shadow-xl" alt="User Avatar">
+            <span class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-lg border-2 border-zinc-900">
+              <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+            </span>
           </div>
 
-          <div>
-            <h2 id="profile-name" class="text-2xl font-bold">André</h2>
-            <p id="profile-email" class="text-xs text-[var(--text-secondary)]">andre@musicflow.app</p>
+          <div class="space-y-1">
+            <h2 id="profile-name" class="text-2xl font-extrabold text-white">André</h2>
+            <p id="profile-email" class="text-xs text-[var(--text-secondary)] font-mono">andre.nexus@gmail.com</p>
+            <div class="pt-1">
+              <span id="profile-auth-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Conta Google Conectada
+              </span>
+            </div>
           </div>
 
-          <div class="pt-4 flex justify-center gap-3 border-t border-[var(--border-color)]">
-            <button onclick="app.navigateTo('settings')" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold px-4 py-2.5 rounded-xl transition">
-              <i data-lucide="settings" class="w-4 h-4"></i> Definições
+          <div class="pt-4 flex flex-wrap justify-center gap-2.5 border-t border-[var(--border-color)]">
+            <button onclick="app.openGoogleAuthModal()" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold px-4 py-2.5 rounded-xl transition border border-zinc-700">
+              <i data-lucide="user-check" class="w-4 h-4 text-brand-spotify"></i> Mudar de Conta
+            </button>
+            <button onclick="app.navigateTo('settings')" class="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold px-4 py-2.5 rounded-xl transition border border-zinc-700">
+              <i data-lucide="settings" class="w-4 h-4 text-indigo-400"></i> Definições
+            </button>
+            <button onclick="app.logout()" class="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-semibold px-4 py-2.5 rounded-xl transition">
+              <i data-lucide="log-out" class="w-4 h-4"></i> Terminar Sessão
             </button>
           </div>
         </div>
@@ -1312,15 +1327,151 @@
     </div>
   </div>
 
+  <!-- GOOGLE LOGIN WELCOME OVERLAY (SHOWN ON FIRST LAUNCH) -->
+  <div id="modal-auth-welcome" class="hidden fixed inset-0 z-[100] auth-overlay flex flex-col justify-between p-6 sm:p-10 overflow-y-auto">
+    <!-- Top Branding -->
+    <div class="flex items-center justify-between w-full max-w-md mx-auto">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-spotify via-emerald-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-spotify/30">
+          <i data-lucide="waves" class="w-6 h-6 text-black stroke-[2.5]"></i>
+        </div>
+        <span class="text-xl font-extrabold tracking-tight text-white">MusicFlow</span>
+      </div>
+      <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+        v2.5 Pro
+      </span>
+    </div>
+
+    <!-- Center Hero Content -->
+    <div class="my-auto py-8 text-center space-y-6 max-w-md mx-auto">
+      <div class="space-y-2">
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+          Música sem limites.<br>
+          <span class="bg-gradient-to-r from-brand-spotify via-emerald-300 to-cyan-400 bg-clip-text text-transparent">Guardada na tua conta.</span>
+        </h1>
+        <p class="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-xs mx-auto">
+          Inicia sessão com a tua conta Google para sincronizar as tuas faixas, playlists, letras e histórico em qualquer dispositivo.
+        </p>
+      </div>
+
+      <!-- Feature Badges -->
+      <div class="grid grid-cols-2 gap-2.5 text-left pt-2">
+        <div class="p-3 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 backdrop-blur-md flex items-center gap-2.5">
+          <i data-lucide="sparkles" class="w-4 h-4 text-brand-spotify shrink-0"></i>
+          <div>
+            <p class="text-xs font-bold text-white">Áudio Nativo HD</p>
+            <p class="text-[10px] text-zinc-400">Sem cortes ou buffering</p>
+          </div>
+        </div>
+        <div class="p-3 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 backdrop-blur-md flex items-center gap-2.5">
+          <i data-lucide="align-left" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+          <div>
+            <p class="text-xs font-bold text-white">Letras Karaokê</p>
+            <p class="text-[10px] text-zinc-400">Sincronizadas por música</p>
+          </div>
+        </div>
+        <div class="p-3 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 backdrop-blur-md flex items-center gap-2.5">
+          <i data-lucide="cloud" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+          <div>
+            <p class="text-xs font-bold text-white">Conta Segura</p>
+            <p class="text-[10px] text-zinc-400">Perfil individual persistente</p>
+          </div>
+        </div>
+        <div class="p-3 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 backdrop-blur-md flex items-center gap-2.5">
+          <i data-lucide="sliders" class="w-4 h-4 text-amber-400 shrink-0"></i>
+          <div>
+            <p class="text-xs font-bold text-white">Equalizador & FX</p>
+            <p class="text-[10px] text-zinc-400">7 bandas + Crossfade</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="w-full max-w-md mx-auto space-y-3 pt-4">
+      <!-- Google Sign-In Main Action Button -->
+      <button onclick="app.openGoogleAuthModal()" class="w-full google-btn py-4 px-6 rounded-2xl flex items-center justify-center gap-3 text-sm shadow-2xl transition cursor-pointer">
+        <svg class="w-5 h-5" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
+          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+        </svg>
+        <span>Continuar com a Google</span>
+      </button>
+
+      <!-- Offline / Guest Action -->
+      <button onclick="app.continueAsGuest()" class="w-full py-3.5 px-6 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 text-xs font-semibold border border-zinc-800 transition flex items-center justify-center gap-2">
+        <i data-lucide="user" class="w-4 h-4 text-zinc-500"></i> Entrar em Modo Offline
+      </button>
+
+      <p class="text-[10px] text-zinc-500 text-center leading-tight pt-1">
+        Ao continuar, os teus dados ficam salvos localmente e associados ao teu ID Google de forma segura.
+      </p>
+    </div>
+  </div>
+
+  <!-- GOOGLE ACCOUNT CHOOSER / SIGN-IN DIALOG -->
+  <div id="modal-google-picker" class="hidden fixed inset-0 z-[110] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[#1f1f23] border border-zinc-700 w-full max-w-sm rounded-3xl p-6 space-y-5 shadow-2xl text-left">
+      <!-- Google Dialog Header -->
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+          </svg>
+          <span class="text-sm font-bold text-white">Iniciar sessão com a Google</span>
+        </div>
+        <button onclick="app.closeModal('modal-google-picker')" class="text-zinc-400 hover:text-white p-1">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-1">
+        <h4 class="text-sm font-bold text-white">Escolhe uma conta</h4>
+        <p class="text-xs text-zinc-400">para continuar para o <strong class="text-white font-semibold">MusicFlow</strong></p>
+      </div>
+
+      <!-- Quick Account 1 -->
+      <div class="space-y-2">
+        <div onclick="app.completeGoogleAuth('André', 'andre.nexus.business@gmail.com', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80')" class="flex items-center gap-3 p-3 rounded-2xl bg-zinc-800/80 hover:bg-zinc-700 cursor-pointer transition border border-zinc-700/80 group">
+          <div class="relative w-10 h-10 rounded-full overflow-hidden border border-brand-spotify">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80" class="w-full h-full object-cover" alt="Google Avatar">
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-bold text-white group-hover:text-brand-spotify transition">André</p>
+            <p class="text-[11px] text-zinc-400 truncate">andre.nexus.business@gmail.com</p>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-500 group-hover:text-white transition"></i>
+        </div>
+
+        <!-- Custom Account Accordion / Form -->
+        <div class="pt-2 border-t border-zinc-800 space-y-2.5">
+          <p class="text-[11px] text-zinc-400 font-medium">Ou entra com outra conta Google:</p>
+          <div class="space-y-2">
+            <input id="custom-google-name" type="text" placeholder="O teu Nome" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs text-white placeholder-zinc-500 focus:border-brand-spotify focus:outline-none">
+            <input id="custom-google-email" type="email" placeholder="O teu Gmail (ex: utilizador@gmail.com)" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs text-white placeholder-zinc-500 focus:border-brand-spotify focus:outline-none">
+            <button onclick="app.handleCustomGoogleLogin()" class="w-full py-2.5 bg-brand-spotify hover:bg-brand-spotifyHover text-black text-xs font-bold rounded-xl transition shadow">
+              Confirmar e Entrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
   <!-- App Main Scripts with Cache Buster -->
-  <script src="js/app.js?v=20260827_06"></script>
+  <script src="js/app.js?v=20260827_07"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=20260827_06')
+        navigator.serviceWorker.register('./sw.js?v=20260827_07')
           .then((reg) => {
             reg.update();
             reg.addEventListener('updatefound', () => {
