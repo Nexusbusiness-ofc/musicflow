@@ -1680,6 +1680,7 @@
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
       if (window.lucide) window.lucide.createIcons();
+      if (window.adMobService) window.adMobService.refreshWebAds();
     }
 
     async renderHomeView() {
