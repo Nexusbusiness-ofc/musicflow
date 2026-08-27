@@ -2922,6 +2922,30 @@
           const ambientBg = document.getElementById('ambient-glow-bg');
           if (ambientBg) ambientBg.style.backgroundImage = `url(${state.currentSong.cover_url})`;
 
+          const fsPlayer = document.getElementById('fullscreen-player');
+          if (fsPlayer) {
+            const hdrPalettes = [
+              { c1: 'rgba(99, 102, 241, 0.7)', orb1: 'radial-gradient(circle, #6366f1 0%, rgba(99, 102, 241, 0) 70%)', orb2: 'radial-gradient(circle, #ec4899 0%, rgba(236, 72, 153, 0) 70%)', orb3: 'radial-gradient(circle, #3b82f6 0%, rgba(59, 130, 246, 0) 70%)', glow: 'rgba(99, 102, 241, 0.7)' },
+              { c1: 'rgba(16, 185, 129, 0.7)', orb1: 'radial-gradient(circle, #10b981 0%, rgba(16, 185, 129, 0) 70%)', orb2: 'radial-gradient(circle, #06b6d4 0%, rgba(6, 182, 212, 0) 70%)', orb3: 'radial-gradient(circle, #3b82f6 0%, rgba(59, 130, 246, 0) 70%)', glow: 'rgba(16, 185, 129, 0.7)' },
+              { c1: 'rgba(236, 72, 153, 0.7)', orb1: 'radial-gradient(circle, #ec4899 0%, rgba(236, 72, 153, 0) 70%)', orb2: 'radial-gradient(circle, #8b5cf6 0%, rgba(139, 92, 246, 0) 70%)', orb3: 'radial-gradient(circle, #f59e0b 0%, rgba(245, 158, 11, 0) 70%)', glow: 'rgba(236, 72, 153, 0.7)' },
+              { c1: 'rgba(245, 158, 11, 0.7)', orb1: 'radial-gradient(circle, #f59e0b 0%, rgba(245, 158, 11, 0) 70%)', orb2: 'radial-gradient(circle, #ef4444 0%, rgba(239, 68, 68, 0) 70%)', orb3: 'radial-gradient(circle, #ec4899 0%, rgba(236, 72, 153, 0) 70%)', glow: 'rgba(245, 158, 11, 0.7)' },
+              { c1: 'rgba(6, 182, 212, 0.7)', orb1: 'radial-gradient(circle, #06b6d4 0%, rgba(6, 182, 212, 0) 70%)', orb2: 'radial-gradient(circle, #3b82f6 0%, rgba(59, 130, 246, 0) 70%)', orb3: 'radial-gradient(circle, #8b5cf6 0%, rgba(139, 92, 246, 0) 70%)', glow: 'rgba(6, 182, 212, 0.7)' },
+              { c1: 'rgba(29, 185, 84, 0.7)', orb1: 'radial-gradient(circle, #1db954 0%, rgba(29, 185, 84, 0) 70%)', orb2: 'radial-gradient(circle, #10b981 0%, rgba(16, 185, 129, 0) 70%)', orb3: 'radial-gradient(circle, #6366f1 0%, rgba(99, 102, 241, 0) 70%)', glow: 'rgba(29, 185, 84, 0.7)' }
+            ];
+
+            let hash = 0;
+            const str = (state.currentSong.title + state.currentSong.artist) || 'MusicFlow';
+            for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            const pal = hdrPalettes[Math.abs(hash) % hdrPalettes.length];
+
+            fsPlayer.style.setProperty('--hdr-color-1', pal.c1);
+            fsPlayer.style.setProperty('--hdr-orb-1', pal.orb1);
+            fsPlayer.style.setProperty('--hdr-orb-2', pal.orb2);
+            fsPlayer.style.setProperty('--hdr-orb-3', pal.orb3);
+            fsPlayer.style.setProperty('--hdr-shadow-glow', pal.glow);
+            fsPlayer.style.setProperty('--hdr-accent-glow', pal.glow);
+          }
+
           const fsFavBtn = document.getElementById('fs-fav-btn');
           if (fsFavBtn) {
             fsFavBtn.className = `p-3 transition ${state.currentSong.favorite ? 'text-red-500 fill-current' : 'text-zinc-400 hover:text-red-500'}`;
