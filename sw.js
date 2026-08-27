@@ -1,5 +1,5 @@
 // MusicFlow Service Worker - Network-First Strategy for Instant Updates
-const CACHE_NAME = 'musicflow-live-v16';
+const CACHE_NAME = 'musicflow-live-v17';
 
 self.addEventListener('install', (e) => {
   // Activate immediately without waiting for tabs to close
