@@ -259,10 +259,10 @@
         album: 'Minho Rhapsody',
         genre: 'Hip Hop / Trap',
         year: 2024,
-        duration: 32,
+        duration: 14,
         audio_url: './assets/audio/vicios.wav',
         cover_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=500&q=80',
-        lyrics: `[00:00.00] Vícios na noite, rima no sangue\n[00:04.00] Do Minho para o mundo a acelerar\n[00:08.00] Que fusão explosiva é esta!?\n[00:12.00] Chico da Tina a comandar o som\n[00:16.00] Trap português no topo da cena\n[00:20.00] Ouve o flow, sente a energia\n[00:24.00] MusicFlow em alta rotação!`
+        lyrics: `[00:00.00] Vícios na noite, rima no sangue\n[00:03.00] Do Minho para o mundo a acelerar\n[00:06.00] Que fusão explosiva é esta!?\n[00:09.00] Chico da Tina a comandar o som\n[00:11.00] Trap português no topo da cena\n[00:13.00] MusicFlow em alta rotação!`
       },
       {
         id: 'starter_2',
@@ -271,10 +271,10 @@
         album: 'Sacrifício',
         genre: 'Hip Hop / R&B',
         year: 2024,
-        duration: 32,
+        duration: 14,
         audio_url: './assets/audio/cafeina.wav',
         cover_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=500&q=80',
-        lyrics: `[00:00.00] Madrugada fria com sabor a cafeína\n[00:04.50] Histórias da rua que a vida ensina\n[00:08.00] A mente viaja na melodia\n[00:12.50] Cada batida com nostalgia\n[00:16.00] A voz da alma não se cala\n[00:20.50] O flow corre na sala\n[00:24.00] Mais uma noite até o dia raiar`
+        lyrics: `[00:00.00] Madrugada fria com sabor a cafeína\n[00:03.50] Histórias da rua que a vida ensina\n[00:07.00] A mente viaja na melodia\n[00:10.00] Cada batida com nostalgia\n[00:13.00] Mais uma noite até o dia raiar`
       },
       {
         id: 'starter_3',
@@ -283,10 +283,10 @@
         album: 'IV',
         genre: 'Trap / Hip Hop',
         year: 2024,
-        duration: 32,
+        duration: 14,
         audio_url: './assets/audio/devia_ir.wav',
         cover_url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=500&q=80',
-        lyrics: `[00:00.00] Sei que devia ir mas vou ficar\n[00:04.00] O som tá alto e não quero parar\n[00:08.00] A família unida na vibração\n[00:12.00] Mais uma barra no coração\n[00:16.00] Da margem sul para todo o lado\n[00:20.00] O futuro já tá traçado\n[00:24.00] Wet Bed Gang no controlo!`
+        lyrics: `[00:00.00] Sei que devia ir mas vou ficar\n[00:03.50] O som tá alto e não quero parar\n[00:07.00] A família unida na vibração\n[00:10.00] Mais uma barra no coração\n[00:13.00] Wet Bed Gang no controlo!`
       },
       {
         id: 'starter_4',
@@ -295,10 +295,10 @@
         album: 'Afro Fado',
         genre: 'Alternative / Fado Hip Hop',
         year: 2024,
-        duration: 32,
+        duration: 14,
         audio_url: './assets/audio/tata.wav',
         cover_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=500&q=80',
-        lyrics: `[00:00.00] Raízes fundas na terra que piso\n[00:04.00] No som da guitarra acho o meu siso\n[00:08.00] Afro Fado em cada respiração\n[00:12.00] Slow J a cantar com emoção\n[00:16.00] Olha p'ra cima e vê a luz\n[00:20.00] A música que nos conduz\n[00:24.00] O amor é a resposta final`
+        lyrics: `[00:00.00] Raízes fundas na terra que piso\n[00:03.50] No som da guitarra acho o meu siso\n[00:07.00] Afro Fado em cada respiração\n[00:10.00] Slow J a cantar com emoção\n[00:13.00] O amor é a resposta final`
       },
       {
         id: 'starter_5',
@@ -307,10 +307,10 @@
         album: 'After Hours',
         genre: 'Synthwave / Pop',
         year: 2023,
-        duration: 32,
+        duration: 14,
         audio_url: './assets/audio/blinding_lights.wav',
         cover_url: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=500&q=80',
-        lyrics: `[00:00.00] I said, ooh, I'm blinded by the lights\n[00:04.50] No, I can't sleep until I feel your touch\n[00:09.00] I said, ooh, I'm drowning in the night\n[00:13.50] Oh, when I'm like this, you're the one I trust\n[00:18.00] Hey, hey, hey\n[00:22.00] Running out of time\n[00:25.00] Blinded by the lights!`
+        lyrics: `[00:00.00] I said, ooh, I'm blinded by the lights\n[00:03.50] No, I can't sleep until I feel your touch\n[00:07.00] I said, ooh, I'm drowning in the night\n[00:10.50] Oh, when I'm like this, you're the one I trust\n[00:13.00] Blinded by the lights!`
       }
     ];
 
@@ -328,8 +328,8 @@
         audio_url: item.audio_url,
         cover_url: item.cover_url,
         file_format: 'audio/wav',
-        file_size: 5644800,
-        bitrate: '1411 kbps',
+        file_size: 1234800,
+        bitrate: '705 kbps',
         sample_rate: '44.1 kHz',
         lyrics: item.lyrics
       };
@@ -506,7 +506,6 @@
         if (this.currentSong && this.currentSong.audio_blob) {
           try {
             this.audio.src = URL.createObjectURL(this.currentSong.audio_blob);
-            this.audio.load();
           } catch(err) {}
         }
       });
@@ -755,14 +754,18 @@
       this.currentSong = song;
 
       // Always re-hydrate a fresh ObjectURL if stored as blob
+      let targetUrl = song.audio_url;
       if (song.audio_blob) {
         try {
-          song.audio_url = URL.createObjectURL(song.audio_blob);
+          targetUrl = URL.createObjectURL(song.audio_blob);
+          song.audio_url = targetUrl;
         } catch(e) {}
       }
 
-      this.audio.src = song.audio_url;
-      this.audio.load();
+      if (this.audio.src !== targetUrl) {
+        this.audio.src = targetUrl;
+      }
+
       this.currentTime = 0;
       this.duration = song.duration || 0;
       this.emitChange();
@@ -783,11 +786,9 @@
         await this.loadSong(this.queue[0]);
       }
 
-      // Re-hydrate active ObjectURL if needed
       if (this.currentSong && this.currentSong.audio_blob && (!this.audio.src || this.audio.src.startsWith('blob:null'))) {
         try {
           this.audio.src = URL.createObjectURL(this.currentSong.audio_blob);
-          this.audio.load();
         } catch(e) {}
       }
 
@@ -802,15 +803,12 @@
         this.isPlaying = true;
         this.emitChange();
       } catch (e) {
-        console.warn('Initial play error, attempting recovery:', e);
+        console.warn('Initial play notice, retrying on interaction:', e);
         try {
-          this.audio.load();
           await this.audio.play();
           this.isPlaying = true;
           this.emitChange();
-        } catch(err2) {
-          console.warn('Playback deferred for user gesture:', err2);
-        }
+        } catch(err2) {}
       }
     }
 
@@ -1237,8 +1235,24 @@
       this.songs = await getSongsForUser(this.user.id);
 
       // Auto migrate and refresh starter tracks to reliable self-hosted paths
-      const hasBrokenUrls = this.songs.some(s => s.audio_url && (s.audio_url.includes('pixabay') || s.audio_url.includes('soundhelix')));
-      if (this.songs.length === 0 || hasBrokenUrls) {
+      const starterAudioMap = {
+        'starter_1': './assets/audio/vicios.wav',
+        'starter_2': './assets/audio/cafeina.wav',
+        'starter_3': './assets/audio/devia_ir.wav',
+        'starter_4': './assets/audio/tata.wav',
+        'starter_5': './assets/audio/blinding_lights.wav'
+      };
+
+      let needsReseed = this.songs.length === 0;
+      for (const song of this.songs) {
+        if (starterAudioMap[song.id] && song.audio_url !== starterAudioMap[song.id]) {
+          song.audio_url = starterAudioMap[song.id];
+          song.duration = 14;
+          await updateSongInLibrary(song);
+        }
+      }
+
+      if (needsReseed) {
         await seedAutomaticStarterTracks(this.user.id);
         this.songs = await getSongsForUser(this.user.id);
       }
