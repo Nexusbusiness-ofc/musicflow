@@ -36,8 +36,12 @@
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- Google AdMob / AdSense Integration -->
+  <meta name="google-adsense-account" content="ca-pub-2898806335291249">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2898806335291249" crossorigin="anonymous"></script>
+
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles.css?v=20260827_16">
+  <link rel="stylesheet" href="styles.css?v=20260827_17">
 </head>
 <body class="bg-[var(--bg-main)] text-[var(--text-primary)] antialiased select-none min-h-screen flex flex-col md:flex-row overflow-x-hidden">
 
@@ -220,6 +224,26 @@
           <div id="home-artists-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
         </div>
 
+        <!-- GOOGLE ADMOB SPONSORED BANNER CARD -->
+        <div class="admob-banner-wrapper my-4">
+          <div class="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800/80 shadow-lg relative overflow-hidden">
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-zinc-800/60">
+              <span class="text-[9px] font-extrabold uppercase tracking-widest text-zinc-400 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-spotify"></span> Publicidade • Google AdMob
+              </span>
+              <span class="admob-badge">Anúncio</span>
+            </div>
+            <div class="admob-slot flex items-center justify-center min-h-[90px] w-full text-center">
+              <ins class="adsbygoogle"
+                   style="display:block; width:100%; min-height:90px;"
+                   data-ad-client="ca-pub-2898806335291249"
+                   data-ad-slot="6730467364"
+                   data-ad-format="auto"
+                   data-full-width-responsive="true"></ins>
+            </div>
+          </div>
+        </div>
+
         <!-- Playlists Section -->
         <div>
           <div class="flex items-center justify-between mb-4">
@@ -296,6 +320,26 @@
 
         <!-- Library Grid / List Container -->
         <div id="library-content-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"></div>
+
+        <!-- GOOGLE ADMOB IN-FEED BANNER CARD -->
+        <div class="admob-banner-wrapper my-6">
+          <div class="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800/80 shadow-lg relative overflow-hidden">
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-zinc-800/60">
+              <span class="text-[9px] font-extrabold uppercase tracking-widest text-zinc-400 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-spotify"></span> Anúncio Patrocinado • Google AdMob
+              </span>
+              <span class="admob-badge">AdMob</span>
+            </div>
+            <div class="admob-slot flex items-center justify-center min-h-[90px] w-full text-center">
+              <ins class="adsbygoogle"
+                   style="display:block; width:100%; min-height:90px;"
+                   data-ad-client="ca-pub-2898806335291249"
+                   data-ad-slot="6730467364"
+                   data-ad-format="auto"
+                   data-full-width-responsive="true"></ins>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- SEARCH VIEW -->
@@ -1613,11 +1657,12 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- App Main Scripts with Cache Buster -->
-  <script src="js/app.js?v=20260827_16"></script>
+  <script src="js/admob.js?v=20260827_17"></script>
+  <script src="js/app.js?v=20260827_17"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=20260827_16')
+        navigator.serviceWorker.register('./sw.js?v=20260827_17')
           .then((reg) => {
             reg.update();
             reg.addEventListener('updatefound', () => {
