@@ -1372,6 +1372,7 @@
       // Restore user theme
       const savedTheme = localStorage.getItem('musicflow_app_theme') || 'dark';
       document.documentElement.setAttribute('data-theme', savedTheme);
+      this.updateThemeToggleIcon(savedTheme);
 
       // Restore language
       const savedLang = localStorage.getItem('musicflow_lang') || 'pt';
@@ -1484,9 +1485,24 @@
       this.showToast('Desligamento agendado para o fim da faixa atual');
     }
 
+    toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      this.setAppTheme(currentTheme === 'light' ? 'dark' : 'light');
+    }
+
+    updateThemeToggleIcon(themeName) {
+      const icon = document.getElementById('theme-toggle-icon');
+      if (!icon) return;
+
+      const iconName = themeName === 'light' ? 'moon' : 'sun';
+      icon.outerHTML = `<i id="theme-toggle-icon" data-lucide="${iconName}" class="w-5 h-5"></i>`;
+      if (window.lucide) window.lucide.createIcons();
+    }
+
     setAppTheme(themeName) {
       document.documentElement.setAttribute('data-theme', themeName);
       localStorage.setItem('musicflow_app_theme', themeName);
+      this.updateThemeToggleIcon(themeName);
       const themeLabels = {
         dark: 'Spotify Dark',
         indigo: 'Neon Indigo',
@@ -2788,10 +2804,15 @@
 
         // Highlight active line in full modal
         const curEl = document.getElementById(`lyric-line-${activeIndex}`);
-        if (curEl) {
-          curEl.classList.add('lyric-line-active');
-          curEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        const lyricsContainer = document.getElementById('lyrics-scroll-container');
+        if (!curEl || !lyricsContainer) return;
+
+        curEl.classList.add('lyric-line-active');
+        const targetScrollTop = curEl.offsetTop - (lyricsContainer.clientHeight - curEl.offsetHeight) / 2;
+        lyricsContainer.scrollTo({
+          top: Math.max(0, targetScrollTop),
+          behavior: 'smooth'
+        });
       }
     }
 
