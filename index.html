@@ -9,7 +9,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="MusicFlow">
-  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/jpeg" href="assets/icons/app-icon.jpg?v=20260828_29">
+  <link rel="apple-touch-icon" href="assets/icons/app-icon.jpg?v=20260828_29">
+  <link rel="manifest" href="manifest.json?v=20260828_29">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -37,7 +39,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles.css?v=20260828_28">
+  <link rel="stylesheet" href="styles.css?v=20260828_29">
 </head>
 <body class="bg-[var(--bg-main)] text-[var(--text-primary)] antialiased select-none min-h-screen flex flex-col md:flex-row overflow-x-hidden relative">
 
@@ -53,9 +55,7 @@
     <div class="space-y-6">
       <!-- Logo -->
       <div class="flex items-center gap-3 px-2 cursor-pointer" onclick="app.navigateTo('home')">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-spotify via-emerald-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-spotify/20">
-          <i data-lucide="waves" class="w-6 h-6 text-black stroke-[2.5]"></i>
-        </div>
+        <img src="assets/icons/app-icon.jpg" class="w-10 h-10 rounded-xl object-cover shadow-lg shadow-brand-spotify/30 border border-white/10 flex-shrink-0" alt="MusicFlow Logo">
         <div>
           <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-zinc-200 to-brand-spotify bg-clip-text text-transparent">MusicFlow</h1>
           <p class="text-[10px] text-[var(--text-muted)] font-semibold tracking-wider uppercase">Audio Experience</p>
@@ -1373,9 +1373,7 @@
     <!-- Top Branding -->
     <div class="flex items-center justify-between w-full max-w-md mx-auto">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-spotify via-emerald-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-spotify/30">
-          <i data-lucide="waves" class="w-6 h-6 text-black stroke-[2.5]"></i>
-        </div>
+        <img src="assets/icons/app-icon.jpg" class="w-10 h-10 rounded-2xl object-cover shadow-lg shadow-brand-spotify/40 border border-white/15" alt="MusicFlow Logo">
         <span class="text-xl font-extrabold tracking-tight text-white">MusicFlow</span>
       </div>
       <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
@@ -1614,11 +1612,11 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- App Main Scripts with Cache Buster -->
-  <script src="js/app.js?v=20260828_28"></script>
+  <script src="js/app.js?v=20260828_29"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=20260828_28')
+        navigator.serviceWorker.register('./sw.js?v=20260828_29')
           .then((reg) => {
             reg.update();
             reg.addEventListener('updatefound', () => {
