@@ -39,6 +39,7 @@ class AdMobService {
 
   refreshWebAds() {
     try {
+      if (window.lucide) window.lucide.createIcons();
       if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
         const slots = document.querySelectorAll('ins.adsbygoogle[data-ad-client]');
         slots.forEach(slot => {
