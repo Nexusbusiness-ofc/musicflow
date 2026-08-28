@@ -2980,6 +2980,13 @@
     }
 
     bindAudioSubscriptions() {
+      let lastSongId = null;
+      let lastPlaying = null;
+      let lastRepeat = null;
+      let lastShuffle = null;
+      let lastFav = null;
+      let lastEq = null;
+
       window.audioEngine.subscribe(state => {
         const miniCover = document.getElementById('mini-cover');
         const miniTitle = document.getElementById('mini-title');
@@ -2988,46 +2995,75 @@
         const miniEq = document.getElementById('mini-eq-indicator');
         const homeNpBanner = document.getElementById('home-now-playing-banner');
 
-        if (state.currentSong) {
-          if (miniCover) miniCover.src = state.currentSong.cover_url;
-          if (miniTitle) miniTitle.innerText = state.currentSong.title;
-          if (miniArtist) miniArtist.innerText = state.currentSong.artist;
+        const isSongChanged = state.currentSong && state.currentSong.id !== lastSongId;
+        const isPlayingChanged = state.isPlaying !== lastPlaying;
+        const isRepeatChanged = state.repeatMode !== lastRepeat;
+        const isShuffleChanged = state.shuffleMode !== lastShuffle;
+        const isFavChanged = state.currentSong && state.currentSong.favorite !== lastFav;
+        const isEqChanged = state.isEqEnabled !== lastEq;
 
-          if (homeNpBanner) {
-            homeNpBanner.classList.remove('hidden');
-            document.getElementById('home-np-cover').src = state.currentSong.cover_url;
-            document.getElementById('home-np-title').innerText = state.currentSong.title;
-            document.getElementById('home-np-artist').innerText = state.currentSong.artist;
+        if (state.currentSong) {
+          if (isSongChanged) {
+            lastSongId = state.currentSong.id;
+            lastFav = state.currentSong.favorite;
+
+            if (miniCover) miniCover.src = state.currentSong.cover_url;
+            if (miniTitle) miniTitle.innerText = state.currentSong.title;
+            if (miniArtist) miniArtist.innerText = state.currentSong.artist;
+
+            if (homeNpBanner) {
+              homeNpBanner.classList.remove('hidden');
+              const hCover = document.getElementById('home-np-cover');
+              const hTitle = document.getElementById('home-np-title');
+              const hArtist = document.getElementById('home-np-artist');
+              if (hCover) hCover.src = state.currentSong.cover_url;
+              if (hTitle) hTitle.innerText = state.currentSong.title;
+              if (hArtist) hArtist.innerText = state.currentSong.artist;
+            }
+
+            const fsCover = document.getElementById('fs-cover');
+            const fsTitle = document.getElementById('fs-title');
+            const fsArtist = document.getElementById('fs-artist');
+            const fsAlbum = document.getElementById('fs-album-name');
+            if (fsCover) fsCover.src = state.currentSong.cover_url;
+            if (fsTitle) fsTitle.innerText = state.currentSong.title;
+            if (fsArtist) fsArtist.innerText = state.currentSong.artist;
+            if (fsAlbum) fsAlbum.innerText = state.currentSong.album || 'Álbum';
+
+            const ambientBg = document.getElementById('ambient-glow-bg');
+            if (ambientBg) ambientBg.style.backgroundImage = `url(${state.currentSong.cover_url})`;
           }
 
-          document.getElementById('fs-cover').src = state.currentSong.cover_url;
-          document.getElementById('fs-title').innerText = state.currentSong.title;
-          document.getElementById('fs-artist').innerText = state.currentSong.artist;
-          document.getElementById('fs-album-name').innerText = state.currentSong.album || 'Álbum';
-
-          const ambientBg = document.getElementById('ambient-glow-bg');
-          if (ambientBg) ambientBg.style.backgroundImage = `url(${state.currentSong.cover_url})`;
-
-          const fsFavBtn = document.getElementById('fs-fav-btn');
-          if (fsFavBtn) {
-            fsFavBtn.className = `p-3 transition ${state.currentSong.favorite ? 'text-red-500 fill-current' : 'text-zinc-400 hover:text-red-500'}`;
+          if (isFavChanged || isSongChanged) {
+            lastFav = state.currentSong.favorite;
+            const fsFavBtn = document.getElementById('fs-fav-btn');
+            if (fsFavBtn) {
+              fsFavBtn.className = `p-2 transition rounded-full hover:bg-white/10 ${state.currentSong.favorite ? 'text-red-500 fill-current' : 'text-white/70 hover:text-red-500'}`;
+            }
           }
 
           this.updateActiveLyricsLine(state.currentTime);
         }
 
-        if (miniEq) {
-          if (state.isPlaying && state.isEqEnabled) miniEq.classList.remove('hidden');
-          else miniEq.classList.add('hidden');
+        if (isEqChanged || isPlayingChanged) {
+          lastEq = state.isEqEnabled;
+          if (miniEq) {
+            if (state.isPlaying && state.isEqEnabled) miniEq.classList.remove('hidden');
+            else miniEq.classList.add('hidden');
+          }
         }
 
-        if (miniPlayIcon) miniPlayIcon.setAttribute('data-lucide', state.isPlaying ? 'pause' : 'play');
-        const fsPlayIcon = document.getElementById('fs-play-icon');
-        if (fsPlayIcon) fsPlayIcon.setAttribute('data-lucide', state.isPlaying ? 'pause' : 'play');
-        const homeNpPlayIcon = document.getElementById('home-np-play-icon');
-        if (homeNpPlayIcon) homeNpPlayIcon.setAttribute('data-lucide', state.isPlaying ? 'pause' : 'play');
-        const lyricsPlayBtn = document.getElementById('lyrics-play-btn');
-        if (lyricsPlayBtn) lyricsPlayBtn.setAttribute('data-lucide', state.isPlaying ? 'pause' : 'play');
+        if (isPlayingChanged) {
+          lastPlaying = state.isPlaying;
+          if (miniPlayIcon) miniPlayIcon.setAttribute('data-lucide', state.isPlaying ? 'pause' : 'play');
+          const fsPlayIcon = document.getElementById('fs-play-icon');
+          if (fsPlayIcon) fsPlayIcon.setAttribute('data-lucide', state.isPlaying ? 'pause' : 'play');
+          const homeNpPlayIcon = document.getElementById('home-np-play-icon');
+          if (homeNpPlayIcon) homeNpPlayIcon.setAttribute('data-lucide', state.isPlaying ? 'pause' : 'play');
+          const lyricsPlayBtn = document.getElementById('lyrics-play-btn');
+          if (lyricsPlayBtn) lyricsPlayBtn.setAttribute('data-lucide', state.isPlaying ? 'pause' : 'play');
+          if (window.lucide) window.lucide.createIcons();
+        }
 
         const fsProgressBar = document.getElementById('fs-progress-bar');
         const fsCurrentTime = document.getElementById('fs-current-time');
@@ -3045,29 +3081,35 @@
         if (fsCurrentTime) fsCurrentTime.innerText = this.formatDuration(state.currentTime);
         if (fsDurationTime) fsDurationTime.innerText = this.formatDuration(state.duration);
 
-        const btnShuffle = document.getElementById('fs-btn-shuffle');
-        if (btnShuffle) {
-          btnShuffle.className = `p-2 transition ${state.shuffleMode ? 'text-brand-spotify' : 'text-zinc-400 hover:text-white'}`;
+        if (isShuffleChanged) {
+          lastShuffle = state.shuffleMode;
+          const btnShuffle = document.getElementById('fs-btn-shuffle');
+          if (btnShuffle) {
+            btnShuffle.className = `p-2 transition ${state.shuffleMode ? 'text-brand-spotify' : 'text-white/60 hover:text-white'}`;
+          }
         }
 
-        // Distinct Repeat Button with "1" badge for repeat-one mode
-        const btnRepeat = document.getElementById('fs-btn-repeat');
-        const repeatIcon = document.getElementById('fs-repeat-icon');
-        const repeatOneBadge = document.getElementById('fs-repeat-one-badge');
+        if (isRepeatChanged) {
+          lastRepeat = state.repeatMode;
+          const btnRepeat = document.getElementById('fs-btn-repeat');
+          const repeatIcon = document.getElementById('fs-repeat-icon');
+          const repeatOneBadge = document.getElementById('fs-repeat-one-badge');
 
-        if (btnRepeat) {
-          if (state.repeatMode === 'off') {
-            btnRepeat.className = 'p-2 text-white/60 hover:text-white transition relative';
-            if (repeatIcon) repeatIcon.setAttribute('data-lucide', 'repeat');
-            if (repeatOneBadge) repeatOneBadge.classList.add('hidden');
-          } else if (state.repeatMode === 'all') {
-            btnRepeat.className = 'p-2 text-brand-spotify font-bold transition relative btn-repeat-active';
-            if (repeatIcon) repeatIcon.setAttribute('data-lucide', 'repeat');
-            if (repeatOneBadge) repeatOneBadge.classList.add('hidden');
-          } else if (state.repeatMode === 'one') {
-            btnRepeat.className = 'p-2 text-brand-spotify font-bold transition relative btn-repeat-active';
-            if (repeatIcon) repeatIcon.setAttribute('data-lucide', 'repeat');
-            if (repeatOneBadge) repeatOneBadge.classList.remove('hidden');
+          if (btnRepeat) {
+            if (state.repeatMode === 'off') {
+              btnRepeat.className = 'p-2 text-white/60 hover:text-white transition relative';
+              if (repeatIcon) repeatIcon.setAttribute('data-lucide', 'repeat');
+              if (repeatOneBadge) repeatOneBadge.classList.add('hidden');
+            } else if (state.repeatMode === 'all') {
+              btnRepeat.className = 'p-2 text-brand-spotify font-bold transition relative btn-repeat-active';
+              if (repeatIcon) repeatIcon.setAttribute('data-lucide', 'repeat');
+              if (repeatOneBadge) repeatOneBadge.classList.add('hidden');
+            } else if (state.repeatMode === 'one') {
+              btnRepeat.className = 'p-2 text-brand-spotify font-bold transition relative btn-repeat-active';
+              if (repeatIcon) repeatIcon.setAttribute('data-lucide', 'repeat');
+              if (repeatOneBadge) repeatOneBadge.classList.remove('hidden');
+            }
+            if (window.lucide) window.lucide.createIcons();
           }
         }
 
@@ -3087,9 +3129,6 @@
             if (sleepSettingsStatus) sleepSettingsStatus.innerText = 'Desligado';
           }
         }
-
-        window.audioEngine.updateEqUIState();
-        if (window.lucide) window.lucide.createIcons();
       });
     }
 
