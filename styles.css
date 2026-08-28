@@ -1,95 +1,83 @@
-/* MusicFlow - Modern Dynamic HDR Spotify-Style CSS */
+/* MusicFlow - Ultimate Dynamic HDR & Advanced Glassmorphism CSS */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --bg-main: #09090b;
-  --bg-card: #141418;
-  --bg-card-hover: #1c1c22;
-  --bg-sidebar: #0d0d11;
-  --bg-player: #121216;
-  --text-primary: #f4f4f5;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  --accent-color: #1db954;
-  --accent-hover: #1ed760;
-  --accent-glow: rgba(29, 185, 84, 0.25);
-  --border-color: #27272a;
-  --glass-bg: rgba(20, 20, 24, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --bg-main: #07070a;
+  --bg-card: rgba(255, 255, 255, 0.035);
+  --bg-card-hover: rgba(255, 255, 255, 0.07);
+  --bg-sidebar: rgba(12, 12, 18, 0.65);
+  --bg-player: rgba(14, 14, 22, 0.7);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-color: #10b981;
+  --accent-hover: #34d399;
+  --accent-glow: rgba(16, 185, 129, 0.35);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(18, 18, 26, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.12);
 
-  /* Dynamic Song Colors (Auto-Extracted from Artwork) */
-  --song-primary: #1db954;
-  --song-secondary: #1e3a8a;
-  --song-accent: #10b981;
-  --song-dark: #0a0a0f;
-  --song-glow: rgba(29, 185, 84, 0.35);
+  /* Dynamic Song HDR Colors (Auto-Calculated from Active Song) */
+  --song-primary: #10b981;
+  --song-secondary: #6366f1;
+  --song-accent: #06b6d4;
+  --song-dark: #0a0a12;
+  --song-glow: rgba(16, 185, 129, 0.4);
+  --hdr-orb-1: radial-gradient(circle, #10b981 0%, rgba(16, 185, 129, 0) 70%);
+  --hdr-orb-2: radial-gradient(circle, #6366f1 0%, rgba(99, 102, 241, 0) 70%);
+  --hdr-orb-3: radial-gradient(circle, #ec4899 0%, rgba(236, 72, 153, 0) 70%);
+  --hdr-shadow-glow: rgba(16, 185, 129, 0.45);
+  --hdr-accent-glow: rgba(99, 102, 241, 0.35);
   --audio-energy: 1.0;
 }
 
 [data-theme="indigo"] {
-  --bg-main: #0b0b14;
-  --bg-card: #131322;
-  --bg-card-hover: #1c1c33;
-  --bg-sidebar: #0e0e1a;
-  --bg-player: #111120;
-  --text-primary: #f4f4f5;
+  --bg-main: #070712;
+  --bg-card: rgba(99, 102, 241, 0.04);
+  --bg-card-hover: rgba(99, 102, 241, 0.08);
+  --bg-sidebar: rgba(10, 10, 22, 0.65);
+  --bg-player: rgba(12, 12, 26, 0.7);
+  --text-primary: #f8fafc;
   --text-secondary: #a5b4fc;
   --text-muted: #6366f1;
   --accent-color: #6366f1;
   --accent-hover: #818cf8;
-  --accent-glow: rgba(99, 102, 241, 0.35);
-  --border-color: #272744;
-  --glass-bg: rgba(19, 19, 34, 0.8);
-}
-
-[data-theme="amber"] {
-  --bg-main: #0c0a07;
-  --bg-card: #18140e;
-  --bg-card-hover: #241d14;
-  --bg-sidebar: #100d09;
-  --bg-player: #14110b;
-  --text-primary: #fef3c7;
-  --text-secondary: #d97706;
-  --text-muted: #b45309;
-  --accent-color: #f59e0b;
-  --accent-hover: #fbbf24;
-  --accent-glow: rgba(245, 158, 11, 0.35);
-  --border-color: #3b2d18;
-  --glass-bg: rgba(24, 20, 14, 0.8);
+  --accent-glow: rgba(99, 102, 241, 0.4);
+  --border-color: rgba(99, 102, 241, 0.15);
+  --glass-bg: rgba(15, 15, 30, 0.6);
 }
 
 [data-theme="rose"] {
-  --bg-main: #0d070b;
-  --bg-card: #1a0f16;
-  --bg-card-hover: #261621;
-  --bg-sidebar: #12090f;
-  --bg-player: #170d14;
-  --text-primary: #fce7f3;
+  --bg-main: #0c060a;
+  --bg-card: rgba(236, 72, 153, 0.04);
+  --bg-card-hover: rgba(236, 72, 153, 0.08);
+  --bg-sidebar: rgba(18, 9, 15, 0.65);
+  --bg-player: rgba(22, 10, 18, 0.7);
+  --text-primary: #fdf2f8;
   --text-secondary: #f472b6;
   --text-muted: #db2777;
   --accent-color: #ec4899;
   --accent-hover: #f472b6;
-  --accent-glow: rgba(236, 72, 153, 0.35);
-  --border-color: #3d1b2f;
-  --glass-bg: rgba(26, 15, 22, 0.8);
+  --accent-glow: rgba(236, 72, 153, 0.4);
+  --border-color: rgba(236, 72, 153, 0.15);
+  --glass-bg: rgba(24, 12, 20, 0.6);
 }
 
-[data-theme="light"] {
-  --bg-main: #f8fafc;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f1f5f9;
-  --bg-sidebar: #f1f5f9;
-  --bg-player: #ffffff;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --accent-color: #10b981;
-  --accent-hover: #059669;
-  --accent-glow: rgba(16, 185, 129, 0.2);
-  --border-color: #e2e8f0;
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(0, 0, 0, 0.08);
+[data-theme="amber"] {
+  --bg-main: #0a0805;
+  --bg-card: rgba(245, 158, 11, 0.04);
+  --bg-card-hover: rgba(245, 158, 11, 0.08);
+  --bg-sidebar: rgba(16, 12, 8, 0.65);
+  --bg-player: rgba(20, 14, 9, 0.7);
+  --text-primary: #fefce8;
+  --text-secondary: #fbbf24;
+  --text-muted: #d97706;
+  --accent-color: #f59e0b;
+  --accent-hover: #fbbf24;
+  --accent-glow: rgba(245, 158, 11, 0.4);
+  --border-color: rgba(245, 158, 11, 0.15);
+  --glass-bg: rgba(22, 16, 10, 0.6);
 }
 
 * {
@@ -106,6 +94,126 @@ body {
   overflow-x: hidden;
   user-select: none;
   min-height: 100vh;
+  position: relative;
+}
+
+/* ==========================================================================
+   GLOBAL LIVING HDR AMBIENT AURA LAYER
+   ========================================================================== */
+#global-ambient-aura {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.global-aura-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  mix-blend-mode: screen;
+  opacity: 0.35;
+  animation: auraFloat 22s infinite ease-in-out alternate;
+  pointer-events: none;
+}
+
+.global-aura-orb.aura-1 {
+  top: -15%;
+  left: 5%;
+  width: 520px;
+  height: 520px;
+  background: var(--hdr-orb-1, radial-gradient(circle, #10b981 0%, rgba(16, 185, 129, 0) 70%));
+  animation-duration: 24s;
+}
+
+.global-aura-orb.aura-2 {
+  top: 30%;
+  right: -10%;
+  width: 580px;
+  height: 580px;
+  background: var(--hdr-orb-2, radial-gradient(circle, #6366f1 0%, rgba(99, 102, 241, 0) 70%));
+  animation-duration: 28s;
+  animation-delay: -6s;
+}
+
+.global-aura-orb.aura-3 {
+  bottom: -10%;
+  left: 25%;
+  width: 480px;
+  height: 480px;
+  background: var(--hdr-orb-3, radial-gradient(circle, #ec4899 0%, rgba(236, 72, 153, 0) 70%));
+  animation-duration: 26s;
+  animation-delay: -12s;
+}
+
+@keyframes auraFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(50px, -40px) scale(1.18); }
+  100% { transform: translate(-40px, 45px) scale(0.92); }
+}
+
+/* ==========================================================================
+   GLASSMORPHISM & PREMIUM CARDS
+   ========================================================================== */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+}
+
+.glass-dock {
+  background: rgba(14, 14, 22, 0.72) !important;
+  backdrop-filter: blur(32px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(220%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 
+    0 20px 40px -10px rgba(0, 0, 0, 0.8),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.music-card {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  box-shadow: 
+    0 10px 30px -10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.music-card:hover {
+  background: rgba(255, 255, 255, 0.075);
+  transform: translateY(-4px) scale(1.015);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 
+    0 20px 40px -12px var(--song-glow, rgba(0, 0, 0, 0.7)),
+    0 0 25px -5px var(--song-accent, rgba(16, 185, 129, 0.3)),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.music-card:hover .play-btn-overlay {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.play-btn-overlay {
+  opacity: 0;
+  transform: translateY(8px) scale(0.9);
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.45);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.play-btn-overlay:hover {
+  transform: scale(1.1);
+  background: #f8fafc;
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.65);
 }
 
 /* Custom Scrollbar */
@@ -117,43 +225,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
-}
-
-/* Glassmorphism & Cards */
-.glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-}
-
-.music-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.music-card:hover {
-  background-color: var(--bg-card-hover);
-  transform: translateY(-3px);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
-}
-
-.music-card:hover .play-btn-overlay {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.play-btn-overlay {
-  opacity: 0;
-  transform: translateY(8px);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* Dynamic Ambient Glow & Fullscreen Player Background */
@@ -530,4 +606,202 @@ input:checked + .slider-toggle:before {
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.6);
+}
+
+/* ==========================================================================
+   FLOATING ISLAND MINI-PLAYER & MOBILE NAV DOCK
+   ========================================================================== */
+#mini-player {
+  background: rgba(14, 14, 22, 0.75) !important;
+  backdrop-filter: blur(36px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(36px) saturate(220%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 24px;
+  margin: 0 12px 76px 12px;
+  box-shadow: 
+    0 20px 40px -10px rgba(0, 0, 0, 0.75),
+    0 0 25px -8px var(--song-glow, rgba(16, 185, 129, 0.25)),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.2) !important;
+  transition: all 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (min-width: 768px) {
+  #mini-player {
+    margin: 0 24px 16px 280px;
+    border-radius: 24px;
+  }
+}
+
+#bottom-nav {
+  background: rgba(12, 12, 18, 0.8) !important;
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 28px;
+  margin: 0 14px 10px 14px;
+  box-shadow: 
+    0 16px 36px -8px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* ==========================================================================
+   DYNAMIC HDR COLOR MESH & LIGHTWEIGHT AIRY GLASSMORPHISM FULLSCREEN PLAYER
+   ========================================================================== */
+.player-hdr-mesh {
+  background: rgba(10, 10, 15, 0.28) !important;
+  backdrop-filter: blur(40px) saturate(220%) brightness(1.05);
+  -webkit-backdrop-filter: blur(40px) saturate(220%) brightness(1.05);
+  position: relative;
+  overflow-x: hidden;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+}
+
+.hdr-glow-mesh-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.7;
+}
+
+.hdr-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(95px);
+  opacity: 0.8;
+  mix-blend-mode: screen;
+  animation: hdrOrbFloat 16s ease-in-out infinite alternate;
+}
+
+.hdr-orb.orb-1 {
+  top: -10%;
+  left: 10%;
+  width: 400px;
+  height: 400px;
+  background: var(--hdr-orb-1, radial-gradient(circle, #10b981 0%, rgba(16, 185, 129, 0) 70%));
+  animation-duration: 14s;
+}
+
+.hdr-orb.orb-2 {
+  top: 35%;
+  right: -10%;
+  width: 440px;
+  height: 440px;
+  background: var(--hdr-orb-2, radial-gradient(circle, #6366f1 0%, rgba(99, 102, 241, 0) 70%));
+  animation-duration: 18s;
+  animation-delay: -4s;
+}
+
+.hdr-orb.orb-3 {
+  bottom: 5%;
+  left: 20%;
+  width: 380px;
+  height: 380px;
+  background: var(--hdr-orb-3, radial-gradient(circle, #ec4899 0%, rgba(236, 72, 153, 0) 70%));
+  animation-duration: 20s;
+  animation-delay: -8s;
+}
+
+@keyframes hdrOrbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(35px, -30px) scale(1.12); }
+  100% { transform: translate(-30px, 35px) scale(0.95); }
+}
+
+/* Feather-light Glassmorphic Player Card */
+.glass-player-card {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 
+    0 20px 45px -10px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
+  border-radius: 28px;
+  padding: 1.25rem 1.25rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glass Pill Header */
+.glass-header-pill {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  padding: 5px 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Floating Artwork with Glowing HDR Aura */
+.artwork-floating-aura {
+  border-radius: 28px;
+  box-shadow: 
+    0 24px 50px -10px var(--hdr-shadow-glow, rgba(16, 185, 129, 0.5)),
+    0 0 60px -15px var(--hdr-accent-glow, rgba(99, 102, 241, 0.45));
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Lightweight Glass Lyrics Preview */
+.glass-lyrics-card {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.25s ease;
+}
+
+.glass-lyrics-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Lightweight Glass Bottom Action Button */
+.glass-tool-btn {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 8px 6px;
+  transition: all 0.2s ease;
+}
+
+.glass-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+/* Glossy Floating Play/Pause Button */
+.glass-play-btn {
+  background: rgba(255, 255, 255, 0.95);
+  color: #000000;
+  box-shadow: 
+    0 12px 28px -4px var(--hdr-shadow-glow, rgba(255, 255, 255, 0.4)),
+    0 0 20px rgba(255, 255, 255, 0.3);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-play-btn:hover {
+  transform: scale(1.08);
+  background: #ffffff;
+  box-shadow: 
+    0 16px 36px -4px var(--hdr-shadow-glow, rgba(255, 255, 255, 0.6)),
+    0 0 30px rgba(255, 255, 255, 0.5);
+}
+
+.glass-play-btn:active {
+  transform: scale(0.96);
+}
+
+/* Shimmering Gradient Text */
+.gradient-title {
+  background: linear-gradient(135deg, #ffffff 40%, var(--song-accent, #10b981) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
