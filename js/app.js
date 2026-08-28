@@ -1390,6 +1390,9 @@
 
       if (this.songs.length > 0 && window.audioEngine.queue.length === 0) {
         window.audioEngine.setQueue(this.songs, 0);
+        this.updateSongThemeColors(this.songs[0]);
+      } else if (this.songs.length > 0) {
+        this.updateSongThemeColors(this.songs[0]);
       }
     }
 
@@ -2436,12 +2439,47 @@
     }
 
     // =========================================================
-    // 8. STRICT SONG-SPECIFIC SYNCHRONIZED KARAOKE LYRICS
+    // 8. STRICT SONG-SPECIFIC SYNCHRONIZED KARAOKE LYRICS & DYNAMIC HDR COLORING
     // =========================================================
+
+    updateSongThemeColors(song) {
+      if (!song) return;
+
+      const palettes = [
+        { primary: '#10b981', secondary: '#6366f1', accent: '#06b6d4', glow: 'rgba(16, 185, 129, 0.45)', secGlow: 'rgba(99, 102, 241, 0.4)' },
+        { primary: '#ec4899', secondary: '#8b5cf6', accent: '#38bdf8', glow: 'rgba(236, 72, 153, 0.45)', secGlow: 'rgba(139, 92, 246, 0.4)' },
+        { primary: '#06b6d4', secondary: '#3b82f6', accent: '#a855f7', glow: 'rgba(6, 182, 212, 0.45)', secGlow: 'rgba(59, 130, 246, 0.4)' },
+        { primary: '#f59e0b', secondary: '#ef4444', accent: '#10b981', glow: 'rgba(245, 158, 11, 0.45)', secGlow: 'rgba(239, 68, 68, 0.4)' },
+        { primary: '#8b5cf6', secondary: '#ec4899', accent: '#14b8a6', glow: 'rgba(139, 92, 246, 0.45)', secGlow: 'rgba(236, 72, 153, 0.4)' },
+        { primary: '#14b8a6', secondary: '#3b82f6', accent: '#f59e0b', glow: 'rgba(20, 184, 166, 0.45)', secGlow: 'rgba(59, 130, 246, 0.4)' },
+        { primary: '#f43f5e', secondary: '#fb923c', accent: '#6366f1', glow: 'rgba(244, 63, 94, 0.45)', secGlow: 'rgba(251, 146, 60, 0.4)' }
+      ];
+
+      let hash = 0;
+      const str = (song.title || '') + (song.artist || '') + (song.id || '');
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const palette = palettes[Math.abs(hash) % palettes.length];
+
+      const root = document.documentElement;
+      root.style.setProperty('--song-primary', palette.primary);
+      root.style.setProperty('--song-secondary', palette.secondary);
+      root.style.setProperty('--song-accent', palette.accent);
+      root.style.setProperty('--song-glow', palette.glow);
+      root.style.setProperty('--hdr-orb-1', `radial-gradient(circle, ${palette.primary} 0%, rgba(16, 185, 129, 0) 70%)`);
+      root.style.setProperty('--hdr-orb-2', `radial-gradient(circle, ${palette.secondary} 0%, rgba(99, 102, 241, 0) 70%)`);
+      root.style.setProperty('--hdr-orb-3', `radial-gradient(circle, ${palette.accent} 0%, rgba(236, 72, 153, 0) 70%)`);
+      root.style.setProperty('--hdr-shadow-glow', palette.glow);
+      root.style.setProperty('--hdr-accent-glow', palette.secGlow);
+    }
 
     // Called immediately whenever a new song is loaded in the player
     onSongLoaded(song) {
       if (!song) return;
+
+      // Update global Dynamic HDR colors and lighting
+      this.updateSongThemeColors(song);
 
       // 1. Immediately reset active parsed lyrics so previous song's lyrics NEVER persist
       this.currentParsedLyrics = [];
