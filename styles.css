@@ -787,3 +787,310 @@ input:checked + .slider-toggle:before {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* Light theme and lyrics stability fixes */
+[data-theme="light"] {
+  --bg-main: #f8fafc;
+  --bg-card: rgba(255, 255, 255, 0.78);
+  --bg-card-hover: rgba(226, 232, 240, 0.9);
+  --bg-sidebar: rgba(255, 255, 255, 0.82);
+  --bg-player: rgba(255, 255, 255, 0.88);
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --accent-color: #059669;
+  --accent-hover: #047857;
+  --accent-glow: rgba(5, 150, 105, 0.25);
+  --border-color: rgba(15, 23, 42, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(15, 23, 42, 0.12);
+  color-scheme: light;
+}
+
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-white\/70,
+[data-theme="light"] .text-white\/80,
+[data-theme="light"] .text-zinc-300 {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .text-zinc-400,
+[data-theme="light"] .text-zinc-500 {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .bg-zinc-900 { background-color: #f1f5f9 !important; }
+[data-theme="light"] .bg-zinc-800 { background-color: #e2e8f0 !important; }
+[data-theme="light"] .bg-zinc-700 { background-color: #cbd5e1 !important; }
+[data-theme="light"] .border-zinc-800,
+[data-theme="light"] .border-zinc-700 { border-color: #cbd5e1 !important; }
+[data-theme="light"] .glass-lyrics-card,
+[data-theme="light"] .glass-tool-btn {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+/* Keep intentionally dark, immersive player surfaces legible in light mode. */
+[data-theme="light"] #fullscreen-player,
+[data-theme="light"] #modal-lyrics { color: #ffffff; }
+[data-theme="light"] #fullscreen-player .text-white,
+[data-theme="light"] #fullscreen-player .text-white\/70,
+[data-theme="light"] #fullscreen-player .text-white\/80,
+[data-theme="light"] #fullscreen-player .text-zinc-300,
+[data-theme="light"] #modal-lyrics .text-white,
+[data-theme="light"] #modal-lyrics .text-white\/70,
+[data-theme="light"] #modal-lyrics .text-white\/80,
+[data-theme="light"] #modal-lyrics .text-zinc-300 { color: #ffffff !important; }
+
+#modal-lyrics {
+  width: 100%;
+  max-width: none !important;
+  height: 100dvh;
+  margin: 0 !important;
+  isolation: isolate;
+}
+
+.lyrics-scroll-container {
+  min-height: 0;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+/* Additional light-mode utility contrast */
+[data-theme="light"] .text-white\/40,
+[data-theme="light"] .text-white\/60,
+[data-theme="light"] .text-zinc-200 { color: #334155 !important; }
+[data-theme="light"] .hover\:text-white:hover { color: #0f172a !important; }
+[data-theme="light"] #fullscreen-player .text-white\/40,
+[data-theme="light"] #fullscreen-player .text-white\/60,
+[data-theme="light"] #modal-lyrics .text-white\/40,
+[data-theme="light"] #modal-lyrics .text-white\/60 { color: rgba(255, 255, 255, 0.75) !important; }
+/* MusicFlow Signature Glass System */
+:root {
+  --mf-radius-xl: 28px;
+  --mf-radius-lg: 20px;
+  --mf-shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.22);
+  --mf-shadow-float: 0 28px 70px rgba(0, 0, 0, 0.35);
+  --mf-shine: rgba(255, 255, 255, 0.16);
+}
+
+body {
+  background-color: var(--bg-main);
+  background-image:
+    radial-gradient(ellipse 70% 50% at 8% -10%, var(--song-primary) 0%, transparent 66%),
+    radial-gradient(ellipse 55% 45% at 100% 12%, var(--song-secondary) 0%, transparent 68%),
+    radial-gradient(ellipse 55% 48% at 50% 105%, var(--song-accent) 0%, transparent 70%),
+    linear-gradient(145deg, var(--bg-main) 0%, #0a0b12 52%, #06070b 100%);
+  background-attachment: fixed;
+  transition: background 700ms ease, color 300ms ease;
+}
+
+[data-theme="light"] body {
+  background-image:
+    radial-gradient(ellipse 68% 52% at 4% -10%, rgba(16, 185, 129, 0.20) 0%, transparent 68%),
+    radial-gradient(ellipse 58% 50% at 100% 8%, rgba(99, 102, 241, 0.16) 0%, transparent 70%),
+    linear-gradient(145deg, #f8fafc 0%, #eef7f5 52%, #eaf0ff 100%);
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+#global-ambient-aura {
+  opacity: 0.78;
+  filter: saturate(1.18);
+}
+
+[data-theme="light"] .global-aura-orb { mix-blend-mode: multiply; opacity: 0.17; }
+
+#sidebar {
+  background: linear-gradient(165deg, rgba(19, 20, 30, 0.82), rgba(9, 10, 16, 0.58)) !important;
+  backdrop-filter: blur(34px) saturate(160%);
+  -webkit-backdrop-filter: blur(34px) saturate(160%);
+  box-shadow: 18px 0 55px rgba(0, 0, 0, 0.15), inset -1px 0 rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] #sidebar {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.88), rgba(241, 245, 249, 0.68)) !important;
+  box-shadow: 18px 0 55px rgba(71, 85, 105, 0.10), inset -1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.glass-panel,
+#bottom-nav {
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.035) 45%, rgba(255, 255, 255, 0.075)) !important;
+  backdrop-filter: blur(30px) saturate(170%);
+  -webkit-backdrop-filter: blur(30px) saturate(170%);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.12), inset 0 1px 0 var(--mf-shine);
+}
+
+[data-theme="light"] .glass-panel,
+[data-theme="light"] #bottom-nav {
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.86), rgba(248, 250, 252, 0.62)) !important;
+}
+
+header.glass-panel {
+  border-radius: 0 0 var(--mf-radius-lg) var(--mf-radius-lg);
+  margin: 0 14px;
+  border-top: 0 !important;
+}
+
+#content-container { padding-top: clamp(1.4rem, 3vw, 2.4rem); }
+
+.nav-item {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+  transition: transform 220ms ease, background 220ms ease, color 220ms ease, border-color 220ms ease;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, var(--song-primary), var(--song-accent));
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.nav-item > * { position: relative; z-index: 1; }
+.nav-item:hover { transform: translateX(3px); border-color: rgba(255, 255, 255, 0.12); }
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 8px 22px -12px var(--song-glow);
+}
+.nav-item.active::before { opacity: 0.24; }
+
+[data-theme="light"] .nav-item.active { color: #0f172a !important; border-color: rgba(15, 23, 42, 0.10); }
+
+.music-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.028)) !important;
+  border-color: rgba(255, 255, 255, 0.11) !important;
+  border-radius: var(--mf-radius-lg) !important;
+  box-shadow: var(--mf-shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.13);
+}
+
+.music-card::after {
+  content: '';
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  right: -62px;
+  top: -65px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--song-primary) 0%, transparent 72%);
+  opacity: 0;
+  transition: opacity 280ms ease;
+  pointer-events: none;
+}
+
+.music-card:hover {
+  transform: translateY(-7px) scale(1.018);
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 25px 55px -24px var(--song-glow), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+.music-card:hover::after { opacity: 0.30; }
+.music-card img { transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1), filter 300ms ease; }
+.music-card:hover img { transform: scale(1.055); filter: saturate(1.12) contrast(1.04); }
+
+[data-theme="light"] .music-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(241, 245, 249, 0.66)) !important;
+  border-color: rgba(15, 23, 42, 0.10) !important;
+  box-shadow: 0 16px 38px -26px rgba(15, 23, 42, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.dynamic-hero-banner {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background:
+    linear-gradient(120deg, rgba(5, 7, 14, 0.68), rgba(6, 7, 14, 0.36)),
+    radial-gradient(circle at 10% 5%, var(--song-primary) 0%, transparent 45%),
+    radial-gradient(circle at 95% 100%, var(--song-secondary) 0%, transparent 56%) !important;
+  backdrop-filter: blur(20px) saturate(145%);
+  -webkit-backdrop-filter: blur(20px) saturate(145%);
+  box-shadow: var(--mf-shadow-float), 0 0 70px -30px var(--song-glow), inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
+
+.glass-dock,
+.glass-player-card {
+  background: linear-gradient(120deg, rgba(18, 20, 32, 0.82), rgba(12, 13, 22, 0.64)) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+}
+
+.glass-lyrics-card,
+.glass-tool-btn,
+.queue-item {
+  border-color: rgba(255, 255, 255, 0.13) !important;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.025)) !important;
+}
+
+[class*="bg-[var(--bg-card)]"] {
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 12px 30px -24px rgba(0, 0, 0, 0.7);
+}
+
+input:not([type="range"]),
+textarea,
+select {
+  background-color: rgba(255, 255, 255, 0.055) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+input:not([type="range"]):focus,
+textarea:focus,
+select:focus {
+  border-color: var(--song-primary, var(--accent-color)) !important;
+  box-shadow: 0 0 0 4px var(--song-glow), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="light"] input:not([type="range"]),
+[data-theme="light"] textarea,
+[data-theme="light"] select { background-color: rgba(255, 255, 255, 0.72) !important; border-color: rgba(15, 23, 42, 0.13) !important; }
+
+button { transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+button:active { transform: scale(0.97); }
+
+#modal-lyrics,
+#fullscreen-player {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 0 100px -25px var(--song-glow);
+}
+
+div[id^="modal-"]:not(#modal-lyrics) > div {
+  background: linear-gradient(145deg, rgba(26, 28, 42, 0.86), rgba(12, 13, 22, 0.78)) !important;
+  backdrop-filter: blur(30px) saturate(160%);
+  -webkit-backdrop-filter: blur(30px) saturate(160%);
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: var(--mf-shadow-float), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+[data-theme="light"] div[id^="modal-"]:not(#modal-lyrics) > div {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(241, 245, 249, 0.88)) !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--song-primary), var(--song-secondary));
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::selection { background: var(--song-primary); color: #06120c; }
+
+@media (max-width: 767px) {
+  header.glass-panel { margin: 0 8px; border-radius: 0 0 18px 18px; }
+  #content-container { padding: 1.1rem 1rem 6.5rem; }
+  #bottom-nav { margin: 0 8px; border-radius: 18px; left: 0 !important; right: 0 !important; bottom: 8px !important; }
+  .music-card:hover { transform: translateY(-3px) scale(1.01); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
