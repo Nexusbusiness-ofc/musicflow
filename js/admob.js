@@ -1,7 +1,7 @@
-﻿/**
+/**
  * MusicFlow AdMob & Google Ads Monetization Service
  * Handles Google AdMob App ID: ca-app-pub-2898806335291249~9336449403
- * Banner Ad Unit ID: ca-app-pub-2898806335291249/6730467364
+ * Banner Ad Unit ID: ca-app-pub-2898806335291249/7684757702
  */
 
 class AdMobService {
@@ -9,7 +9,7 @@ class AdMobService {
     this.config = {
       publisherId: 'ca-pub-2898806335291249',
       appId: 'ca-app-pub-2898806335291249~9336449403',
-      bannerAdUnitId: 'ca-app-pub-2898806335291249/6730467364',
+      bannerAdUnitId: 'ca-app-pub-2898806335291249/7684757702',
       isNativeAdMobAvailable: false,
       initialized: false
     };
