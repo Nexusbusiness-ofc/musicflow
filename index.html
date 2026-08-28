@@ -39,7 +39,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles.css?v=20260828_29">
+  <link rel="stylesheet" href="styles.css?v=20260828_30">
 </head>
 <body class="bg-[var(--bg-main)] text-[var(--text-primary)] antialiased select-none min-h-screen flex flex-col md:flex-row overflow-x-hidden relative">
 
@@ -1093,64 +1093,66 @@
   </div>
 
   <!-- SPOTIFY-STYLE SYNCHRONIZED KARAOKE LYRICS MODAL WITH DYNAMIC HDR GRADIENT -->
-  <div id="modal-lyrics" class="hidden fixed inset-0 z-50 dynamic-hdr-bg flex flex-col p-4 sm:p-8 max-w-4xl mx-auto shadow-2xl">
+  <div id="modal-lyrics" class="hidden fixed inset-0 z-50 dynamic-hdr-bg flex flex-col p-4 sm:p-8">
     <div id="lyrics-ambient-bg" class="ambient-glow opacity-45"></div>
 
-    <!-- Lyrics Top Navigation & Control Bar -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10 z-10">
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-white/70">LETRA SINCRONIZADA</span>
-          <span id="lyrics-synced-badge" class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-white/20 text-white backdrop-blur-md">Karaoke</span>
+    <div class="w-full max-w-4xl mx-auto h-full flex flex-col z-10">
+      <!-- Lyrics Top Navigation & Control Bar -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-white/70">LETRA SINCRONIZADA</span>
+            <span id="lyrics-synced-badge" class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-white/20 text-white backdrop-blur-md">Karaoke</span>
+          </div>
+          <h3 id="lyrics-track-title" class="text-lg md:text-2xl font-extrabold text-white truncate max-w-[280px] sm:max-w-md drop-shadow">Título</h3>
+          <p id="lyrics-track-artist" class="text-xs text-zinc-300 truncate font-medium">Artista</p>
         </div>
-        <h3 id="lyrics-track-title" class="text-lg md:text-2xl font-extrabold text-white truncate max-w-[280px] sm:max-w-md drop-shadow">Título</h3>
-        <p id="lyrics-track-artist" class="text-xs text-zinc-300 truncate font-medium">Artista</p>
+
+        <!-- Action Tools: Online Search, File Import, Manual Edit -->
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <!-- Online Search Button -->
+          <button onclick="app.openOnlineLyricsSearch()" class="flex items-center gap-1.5 px-3 py-1.5 bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs font-semibold rounded-xl transition backdrop-blur-md" title="Pesquisar letra sincronizada na Internet">
+            <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+            <span>Importar Online</span>
+          </button>
+
+          <!-- Import LRC / TXT File -->
+          <label class="flex items-center gap-1.5 px-3 py-1.5 bg-black/40 hover:bg-black/60 border border-white/15 text-white text-xs font-semibold rounded-xl cursor-pointer transition backdrop-blur-md" title="Importar ficheiro .lrc ou .txt">
+            <i data-lucide="file-text" class="w-3.5 h-3.5 text-indigo-300"></i>
+            <span>Ficheiro (.lrc)</span>
+            <input type="file" id="lyrics-file-input" accept=".lrc,.txt" class="hidden" onchange="app.handleLyricsFileInput(this.files)">
+          </label>
+
+          <!-- Manual Edit / Add Button -->
+          <button onclick="app.openLyricsEditor()" class="flex items-center gap-1.5 px-3 py-1.5 bg-black/40 hover:bg-black/60 border border-white/15 text-white text-xs font-semibold rounded-xl transition backdrop-blur-md" title="Escrever ou editar letra com timestamps">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5 text-amber-300"></i>
+            <span>Editar</span>
+          </button>
+
+          <button onclick="app.closeModal('modal-lyrics')" class="p-2 text-white/70 hover:text-white rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
       </div>
 
-      <!-- Action Tools: Online Search, File Import, Manual Edit -->
-      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-        <!-- Online Search Button -->
-        <button onclick="app.openOnlineLyricsSearch()" class="flex items-center gap-1.5 px-3 py-1.5 bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs font-semibold rounded-xl transition backdrop-blur-md" title="Pesquisar letra sincronizada na Internet">
-          <i data-lucide="globe" class="w-3.5 h-3.5"></i>
-          <span>Importar Online</span>
-        </button>
-
-        <!-- Import LRC / TXT File -->
-        <label class="flex items-center gap-1.5 px-3 py-1.5 bg-black/40 hover:bg-black/60 border border-white/15 text-white text-xs font-semibold rounded-xl cursor-pointer transition backdrop-blur-md" title="Importar ficheiro .lrc ou .txt">
-          <i data-lucide="file-text" class="w-3.5 h-3.5 text-indigo-300"></i>
-          <span>Ficheiro (.lrc)</span>
-          <input type="file" id="lyrics-file-input" accept=".lrc,.txt" class="hidden" onchange="app.handleLyricsFileInput(this.files)">
-        </label>
-
-        <!-- Manual Edit / Add Button -->
-        <button onclick="app.openLyricsEditor()" class="flex items-center gap-1.5 px-3 py-1.5 bg-black/40 hover:bg-black/60 border border-white/15 text-white text-xs font-semibold rounded-xl transition backdrop-blur-md" title="Escrever ou editar letra com timestamps">
-          <i data-lucide="edit-3" class="w-3.5 h-3.5 text-amber-300"></i>
-          <span>Editar</span>
-        </button>
-
-        <button onclick="app.closeModal('modal-lyrics')" class="p-2 text-white/70 hover:text-white rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+      <!-- Scrolling Lyrics Canvas -->
+      <div id="lyrics-scroll-container" class="lyrics-scroll-container flex-1 overflow-y-auto py-12 px-2 sm:px-6 space-y-4 text-left">
+        <!-- Dynamic lyric lines rendered here -->
       </div>
-    </div>
 
-    <!-- Scrolling Lyrics Canvas -->
-    <div id="lyrics-scroll-container" class="lyrics-scroll-container flex-1 overflow-y-auto py-12 px-2 sm:px-6 space-y-4 z-10 text-left">
-      <!-- Dynamic lyric lines rendered here -->
-    </div>
-
-    <!-- Bottom Lyrics Mini Control Bar -->
-    <div class="flex items-center justify-between pt-4 border-t border-white/10 text-xs text-white/70 z-10">
-      <span class="text-[11px] flex items-center gap-1.5">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-white"></i>
-        <span>Clica em qualquer verso para saltar instantaneamente para essa parte da música.</span>
-      </span>
-      <button onclick="audioEngine.togglePlay()" class="p-3 rounded-full bg-white text-black hover:scale-105 transition shadow-xl">
-        <i id="lyrics-play-btn" data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
-      </button>
+      <!-- Bottom Lyrics Mini Control Bar -->
+      <div class="flex items-center justify-between pt-4 border-t border-white/10 text-xs text-white/70">
+        <span class="text-[11px] flex items-center gap-1.5">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-white"></i>
+          <span>Clica em qualquer verso para saltar instantaneamente para essa parte da música.</span>
+        </span>
+        <button onclick="audioEngine.togglePlay()" class="p-3 rounded-full bg-white text-black hover:scale-105 transition shadow-xl">
+          <i id="lyrics-play-btn" data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- SPOTIFY-STYLE PLAYBACK QUEUE MODAL (WITH REORDERING, DRAG & DROP, ADD TO QUEUE & SELECT) -->
-  <div id="modal-queue" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4">
+  <div id="modal-queue" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-[var(--bg-card)] border border-[var(--border-color)] w-full max-w-lg rounded-3xl p-5 md:p-6 space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
       
       <!-- Queue Header & Actions -->
@@ -1612,11 +1614,11 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- App Main Scripts with Cache Buster -->
-  <script src="js/app.js?v=20260828_29"></script>
+  <script src="js/app.js?v=20260828_30"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=20260828_29')
+        navigator.serviceWorker.register('./sw.js?v=20260828_30')
           .then((reg) => {
             reg.update();
             reg.addEventListener('updatefound', () => {
