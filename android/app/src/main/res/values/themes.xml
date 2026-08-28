@@ -1,0 +1,14 @@
+﻿<resources>
+    <style name="Theme.MusicFlow" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">#10B981</item>
+        <item name="colorPrimaryVariant">#059669</item>
+        <item name="colorOnPrimary">#000000</item>
+        <item name="android:statusBarColor">#07070A</item>
+        <item name="android:navigationBarColor">#07070A</item>
+    </style>
+
+    <style name="Theme.MusicFlow.NoActionBar" parent="Theme.MusicFlow">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+</resources>
