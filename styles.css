@@ -612,14 +612,17 @@ input:checked + .slider-toggle:before {
    FLOATING ISLAND MINI-PLAYER & MOBILE NAV DOCK
    ========================================================================== */
 #mini-player {
-  background: rgba(14, 14, 22, 0.75) !important;
+  background: rgba(14, 14, 22, 0.85) !important;
   backdrop-filter: blur(36px) saturate(220%) !important;
   -webkit-backdrop-filter: blur(36px) saturate(220%) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 24px;
-  margin: 0 12px 76px 12px;
+  border-radius: 20px;
+  bottom: 58px !important;
+  left: 8px !important;
+  right: 8px !important;
+  margin: 0 !important;
   box-shadow: 
-    0 20px 40px -10px rgba(0, 0, 0, 0.75),
+    0 16px 36px -8px rgba(0, 0, 0, 0.8),
     0 0 25px -8px var(--song-glow, rgba(16, 185, 129, 0.25)),
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.2) !important;
   transition: all 0.35s cubic-bezier(0.32, 0.72, 0, 1);
@@ -627,18 +630,25 @@ input:checked + .slider-toggle:before {
 
 @media (min-width: 768px) {
   #mini-player {
-    margin: 0 24px 16px 280px;
-    border-radius: 24px;
+    bottom: 10px !important;
+    left: 272px !important;
+    right: 16px !important;
+    margin: 0 !important;
+    border-radius: 22px;
   }
 }
 
 #bottom-nav {
-  background: rgba(12, 12, 18, 0.8) !important;
+  background: rgba(12, 12, 18, 0.88) !important;
   backdrop-filter: blur(32px) saturate(200%) !important;
   -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 28px;
-  margin: 0 14px 10px 14px;
+  border-radius: 24px;
+  bottom: 6px !important;
+  left: 8px !important;
+  right: 8px !important;
+  margin: 0 !important;
+  height: 48px;
   box-shadow: 
     0 16px 36px -8px rgba(0, 0, 0, 0.8),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.15) !important;
