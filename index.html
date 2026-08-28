@@ -41,9 +41,16 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2898806335291249" crossorigin="anonymous"></script>
 
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles.css?v=20260827_17">
+  <link rel="stylesheet" href="styles.css?v=20260828_18">
 </head>
-<body class="bg-[var(--bg-main)] text-[var(--text-primary)] antialiased select-none min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+<body class="bg-[var(--bg-main)] text-[var(--text-primary)] antialiased select-none min-h-screen flex flex-col md:flex-row overflow-x-hidden relative">
+
+  <!-- Global Living Dynamic HDR Ambient Aura Layer -->
+  <div id="global-ambient-aura" class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div id="global-orb-1" class="global-aura-orb aura-1"></div>
+    <div id="global-orb-2" class="global-aura-orb aura-2"></div>
+    <div id="global-orb-3" class="global-aura-orb aura-3"></div>
+  </div>
 
   <!-- Desktop Left Sidebar -->
   <aside id="sidebar" class="hidden md:flex flex-col w-64 bg-[var(--bg-sidebar)] border-r border-[var(--border-color)] p-5 fixed top-0 bottom-0 left-0 z-30 justify-between">
@@ -914,43 +921,48 @@
   </main>
 
   <!-- FULL SCREEN PLAYER OVERLAY WITH DYNAMIC HDR GRADIENT MESH -->
-  <div id="fullscreen-player" class="fixed inset-0 z-50 dynamic-hdr-bg flex flex-col justify-between p-4 sm:p-6 md:p-8 transition-transform transform translate-y-full duration-500 overflow-y-auto">
+  <div id="fullscreen-player" class="fixed inset-0 z-50 player-hdr-mesh flex flex-col justify-between p-4 sm:p-6 md:p-8 transition-transform transform translate-y-full duration-500 overflow-y-auto">
+    <div class="hdr-glow-mesh-layer">
+      <div id="fs-orb-1" class="hdr-orb orb-1"></div>
+      <div id="fs-orb-2" class="hdr-orb orb-2"></div>
+      <div id="fs-orb-3" class="hdr-orb orb-3"></div>
+    </div>
     <div id="ambient-glow-bg" class="ambient-glow"></div>
 
     <!-- Top Header -->
-    <div class="flex items-center justify-between z-10 w-full max-w-lg mx-auto">
-      <button onclick="app.closeFullScreenPlayer()" class="p-2 text-white/70 hover:text-white transition">
-        <i data-lucide="chevron-down" class="w-7 h-7"></i>
+    <div class="flex items-center justify-between z-10 w-full max-w-lg mx-auto py-1">
+      <button onclick="app.closeFullScreenPlayer()" class="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-lg border border-white/10 transition shadow-lg">
+        <i data-lucide="chevron-down" class="w-6 h-6"></i>
       </button>
-      <div class="text-center">
-        <span class="text-[10px] font-bold uppercase tracking-widest text-white/60">A REPRODUZIR</span>
-        <h4 id="fs-album-name" class="text-xs font-semibold text-white truncate max-w-[200px]">Álbum</h4>
+      <div class="glass-header-pill text-center flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-spotify animate-pulse"></span>
+        <h4 id="fs-album-name" class="text-xs font-semibold text-white truncate max-w-[180px]">Álbum</h4>
       </div>
-      <button onclick="app.openQueueModal()" class="p-2 text-white/70 hover:text-white transition" title="Fila de Reprodução">
-        <i data-lucide="list-music" class="w-6 h-6"></i>
+      <button onclick="app.openQueueModal()" class="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-lg border border-white/10 transition shadow-lg" title="Fila de Reprodução">
+        <i data-lucide="list-music" class="w-5 h-5"></i>
       </button>
     </div>
 
     <!-- Center Album Artwork with Colored Dynamic Glow Reflection -->
-    <div class="my-auto py-4 z-10 flex flex-col items-center">
-      <div class="relative w-60 h-60 sm:w-72 sm:h-72 md:w-84 md:h-84 rounded-3xl overflow-hidden dynamic-cover-glow border border-white/20 group bg-zinc-900">
+    <div class="my-auto py-2 sm:py-4 z-10 flex flex-col items-center">
+      <div class="relative w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-3xl overflow-hidden artwork-floating-aura group bg-zinc-900">
         <img id="fs-cover" src="" onerror="this.onerror=null; this.src=app.getArtworkFallback('MusicFlow');" class="w-full h-full object-cover transition transform duration-700 group-hover:scale-105" alt="Full Cover">
       </div>
     </div>
 
     <!-- Track Info & Controls Container -->
-    <div class="w-full max-w-md mx-auto space-y-4 z-10">
+    <div class="w-full max-w-md mx-auto z-10 glass-player-card space-y-3.5">
       <div class="flex items-center justify-between">
         <div class="min-w-0 flex-1 pr-2">
-          <h3 id="fs-title" class="text-lg md:text-2xl font-extrabold text-white truncate drop-shadow-md">Título da Música</h3>
+          <h3 id="fs-title" class="text-lg md:text-xl font-extrabold text-white truncate drop-shadow-md">Título da Música</h3>
           <p id="fs-artist" class="text-xs sm:text-sm text-zinc-300 truncate font-medium">Nome do Artista</p>
         </div>
         <div class="flex items-center gap-1">
-          <button onclick="if(window.audioEngine.currentSong) app.openAddToPlaylistModal(window.audioEngine.currentSong.id)" class="p-2.5 text-white/70 hover:text-brand-spotify transition" title="Adicionar à Playlist">
-            <i data-lucide="list-plus" class="w-6 h-6"></i>
+          <button onclick="if(window.audioEngine.currentSong) app.openAddToPlaylistModal(window.audioEngine.currentSong.id)" class="p-2 text-white/70 hover:text-brand-spotify transition rounded-full hover:bg-white/10" title="Adicionar à Playlist">
+            <i data-lucide="list-plus" class="w-5 h-5"></i>
           </button>
-          <button id="fs-fav-btn" onclick="app.toggleCurrentFavorite()" class="p-2.5 text-white/70 hover:text-red-500 transition" title="Favorito">
-            <i data-lucide="heart" class="w-6 h-6"></i>
+          <button id="fs-fav-btn" onclick="app.toggleCurrentFavorite()" class="p-2 text-white/70 hover:text-red-500 transition rounded-full hover:bg-white/10" title="Favorito">
+            <i data-lucide="heart" class="w-5 h-5"></i>
           </button>
         </div>
       </div>
@@ -974,7 +986,7 @@
           <i data-lucide="skip-back" class="w-6 h-6 fill-current"></i>
         </button>
 
-        <button onclick="audioEngine.togglePlay()" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white text-black flex items-center justify-center shadow-2xl transition transform hover:scale-105">
+        <button onclick="audioEngine.togglePlay()" class="w-14 h-14 sm:w-15 sm:h-15 rounded-full glass-play-btn flex items-center justify-center transition transform">
           <i id="fs-play-icon" data-lucide="play" class="w-7 h-7 fill-current ml-0.5"></i>
         </button>
 
@@ -988,54 +1000,43 @@
         </button>
       </div>
 
-      <!-- SPOTIFY IN-PLAYER LYRICS PREVIEW CARD (FOLLOWS MUSIC + CLICK TO JUMP) -->
-      <div class="lyrics-preview-card rounded-2xl p-4 space-y-2 cursor-pointer shadow-xl transition" onclick="app.openLyricsModal()">
+      <!-- SPOTIFY IN-PLAYER LYRICS PREVIEW CARD -->
+      <div class="glass-lyrics-card p-3.5 space-y-1.5 cursor-pointer shadow-lg transition" onclick="app.openLyricsModal()">
         <div class="flex items-center justify-between text-xs">
           <div class="flex items-center gap-2">
-            <span class="font-bold text-white uppercase tracking-wider text-[10px]">Letra da Música</span>
+            <span class="font-bold text-white uppercase tracking-wider text-[9px]">Letra da Música</span>
             <span id="fs-lyrics-auto-status" class="text-[9px] px-2 py-0.5 rounded-full bg-white/15 text-white font-bold backdrop-blur-md">Auto</span>
           </div>
-          <span class="text-[11px] text-white/80 font-semibold flex items-center gap-1 hover:underline">
+          <span class="text-[10px] text-white/80 font-semibold flex items-center gap-1 hover:underline">
             <span>Ecrã Inteiro</span> <i data-lucide="maximize-2" class="w-3 h-3"></i>
           </span>
         </div>
 
         <!-- Real-Time Rolling Active Snippet -->
-        <div id="fs-inline-lyrics-box" class="py-1 min-h-[58px] flex flex-col justify-center space-y-0.5">
+        <div id="fs-inline-lyrics-box" class="py-1 min-h-[50px] flex flex-col justify-center space-y-0.5">
           <p id="fs-inline-prev-line" class="text-[11px] text-white/40 line-clamp-1 truncate font-medium"></p>
-          <p id="fs-inline-active-line" class="text-sm sm:text-base font-bold text-white leading-snug line-clamp-2 drop-shadow">
+          <p id="fs-inline-active-line" class="text-xs sm:text-sm font-bold text-white leading-snug line-clamp-2 drop-shadow">
             Sem letra disponível para esta música.
           </p>
           <p id="fs-inline-next-line" class="text-[11px] text-white/40 line-clamp-1 truncate font-medium"></p>
         </div>
       </div>
 
-      <!-- Bottom Tools Bar with Equalizer Badge, Queue & Lyrics -->
-      <div class="flex items-center justify-around pt-2 border-t border-white/10 text-white/70">
-        <!-- Equalizer Button with On/Off indicator -->
-        <button onclick="app.openEqualizerModal()" class="flex flex-col items-center gap-1 text-[10px] hover:text-white transition group">
-          <div class="flex items-center gap-1">
-            <i data-lucide="sliders" class="w-5 h-5"></i>
-            <span id="fs-eq-badge" class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-white/20 text-white">ON</span>
-          </div>
-          <span>Equalizador</span>
+      <!-- Bottom Tools Bar with Equalizer Badge, Queue & Sleep Timer -->
+      <div class="grid grid-cols-3 gap-2 pt-1">
+        <button onclick="app.openEqualizerModal()" class="glass-tool-btn flex items-center justify-center gap-1.5 text-[11px] text-white/80 hover:text-white transition">
+          <i data-lucide="sliders" class="w-4 h-4 text-brand-spotify"></i>
+          <span class="font-semibold">Equalizador</span>
         </button>
 
-        <!-- Spotify-style Synchronized Lyrics Button -->
-        <button onclick="app.openLyricsModal()" class="flex flex-col items-center gap-1 text-[10px] hover:text-white transition">
-          <i data-lucide="align-left" class="w-5 h-5"></i>
-          <span>Letras</span>
+        <button onclick="app.openLyricsModal()" class="glass-tool-btn flex items-center justify-center gap-1.5 text-[11px] text-white/80 hover:text-white transition">
+          <i data-lucide="align-left" class="w-4 h-4 text-cyan-400"></i>
+          <span class="font-semibold">Letras</span>
         </button>
 
-        <!-- Playback Queue Button -->
-        <button onclick="app.openQueueModal()" class="flex flex-col items-center gap-1 text-[10px] hover:text-white transition">
-          <i data-lucide="list-music" class="w-5 h-5"></i>
-          <span>Fila</span>
-        </button>
-
-        <button onclick="app.openSleepTimerModal()" class="flex flex-col items-center gap-1 text-[10px] hover:text-white transition">
-          <i data-lucide="timer" class="w-5 h-5"></i>
-          <span id="fs-sleep-label">Temporizador</span>
+        <button onclick="app.openSleepTimerModal()" class="glass-tool-btn flex items-center justify-center gap-1.5 text-[11px] text-white/80 hover:text-white transition">
+          <i data-lucide="moon" class="w-4 h-4 text-indigo-400"></i>
+          <span class="font-semibold">Timer</span>
         </button>
       </div>
     </div>
@@ -1657,12 +1658,12 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- App Main Scripts with Cache Buster -->
-  <script src="js/admob.js?v=20260827_17"></script>
-  <script src="js/app.js?v=20260827_17"></script>
+  <script src="js/admob.js?v=20260828_18"></script>
+  <script src="js/app.js?v=20260828_18"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=20260827_17')
+        navigator.serviceWorker.register('./sw.js?v=20260828_18')
           .then((reg) => {
             reg.update();
             reg.addEventListener('updatefound', () => {
