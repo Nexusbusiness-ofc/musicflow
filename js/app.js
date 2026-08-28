@@ -151,7 +151,7 @@
 
   async function getSongsForUser(userId) {
     const all = await idbGetAll('songs');
-    return all.map(song => {
+    return Promise.all(all.map(async song => {
       // ALWAYS generate a fresh, active ObjectURL from stored audio blob
       if (song.audio_blob) {
         try {
@@ -162,9 +162,18 @@
         try {
           song.cover_url = URL.createObjectURL(song.cover_blob);
         } catch (e) {}
+      } else if (song.audio_blob && song.cover_url && song.cover_url.startsWith('blob:')) {
+        // Older imports only saved a temporary Blob URL. Recover the embedded
+        // artwork from the stored audio once, then persist the actual Blob.
+        const coverBlob = await extractEmbeddedArtwork(song.audio_blob);
+        if (coverBlob) {
+          song.cover_blob = coverBlob;
+          song.cover_url = URL.createObjectURL(coverBlob);
+          await idbPut('songs', { ...song, audio_url: '', cover_url: '' });
+        }
       }
       return song;
-    });
+    }));
   }
 
   async function addSongToUserLibrary(songData) {
@@ -183,7 +192,13 @@
       lyrics: songData.lyrics || ''
     };
 
-    await idbPut('songs', song);
+    // Blob URLs only live for the current browser session, so store the
+    // underlying files and recreate their URLs when the library is opened.
+    await idbPut('songs', {
+      ...song,
+      audio_url: song.audio_blob ? '' : song.audio_url,
+      cover_url: song.cover_blob ? '' : song.cover_url
+    });
     return song;
   }
 
@@ -1123,6 +1138,36 @@
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
   }
 
+  async function extractEmbeddedArtwork(file) {
+    try {
+      const header = new Uint8Array(await file.slice(0, 4 * 1024 * 1024).arrayBuffer());
+      if (header.length < 10 || header[0] !== 0x49 || header[1] !== 0x44 || header[2] !== 0x33) return null;
+      const tagSize = ((header[6] & 0x7F) << 21) | ((header[7] & 0x7F) << 14) | ((header[8] & 0x7F) << 7) | (header[9] & 0x7F);
+      const limit = Math.min(header.length, tagSize + 10);
+      for (let i = 10; i < limit - 4; i++) {
+        const isApic = header[i] === 0x41 && header[i + 1] === 0x50 && header[i + 2] === 0x49 && header[i + 3] === 0x43;
+        const isPic = header[i] === 0x50 && header[i + 1] === 0x49 && header[i + 2] === 0x43;
+        if (!isApic && !isPic) continue;
+        const frameHeaderSize = isApic ? 10 : 6;
+        const frameSize = isApic
+          ? ((header[i + 4] & 0x7F) << 21) | ((header[i + 5] & 0x7F) << 14) | ((header[i + 6] & 0x7F) << 7) | (header[i + 7] & 0x7F)
+          : (header[i + 3] << 16) | (header[i + 4] << 8) | header[i + 5];
+        const frameEnd = Math.min(limit, i + frameHeaderSize + frameSize);
+        for (let j = i + frameHeaderSize; j < frameEnd - 12; j++) {
+          let mime = '';
+          if (header[j] === 0xFF && header[j + 1] === 0xD8 && header[j + 2] === 0xFF) mime = 'image/jpeg';
+          else if (header[j] === 0x89 && header[j + 1] === 0x50 && header[j + 2] === 0x4E && header[j + 3] === 0x47) mime = 'image/png';
+          else if (header[j] === 0x47 && header[j + 1] === 0x49 && header[j + 2] === 0x46 && header[j + 3] === 0x38) mime = 'image/gif';
+          else if (header[j] === 0x52 && header[j + 1] === 0x49 && header[j + 2] === 0x46 && header[j + 3] === 0x46 && header[j + 8] === 0x57 && header[j + 9] === 0x45 && header[j + 10] === 0x42 && header[j + 11] === 0x50) mime = 'image/webp';
+          if (mime) return new Blob([header.slice(j, frameEnd)], { type: mime });
+        }
+      }
+    } catch (e) {
+      console.warn('Não foi possível extrair a capa da música.', e);
+    }
+    return null;
+  }
+
   async function parseID3Tags(file) {
     let coverBlobUrl = null;
     let title = null;
@@ -1184,14 +1229,15 @@
       // Fallback
     }
 
-    return { title, artist, album, genre, year, lyrics, coverBlobUrl };
+    const coverBlob = await extractEmbeddedArtwork(file);
+    return { title, artist, album, genre, year, lyrics, coverBlob, coverBlobUrl: coverBlob ? URL.createObjectURL(coverBlob) : null };
   }
 
   async function parseAudioFileMetadata(file) {
     const fileNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
     const url = URL.createObjectURL(file);
 
-    let id3 = { title: null, artist: null, album: null, genre: null, year: null, lyrics: null, coverBlobUrl: null };
+    let id3 = { title: null, artist: null, album: null, genre: null, year: null, lyrics: null, coverBlob: null, coverBlobUrl: null };
     try {
       id3 = await parseID3Tags(file);
     } catch (e) {
@@ -1258,6 +1304,7 @@
       audio_url: url,
       audio_blob: file,
       cover_url: id3.coverBlobUrl || getRandomGradientCover(title + artist),
+      cover_blob: id3.coverBlob,
       file_format: 'audio/mp3',
       file_size: file.size,
       bitrate: '320 kbps',
