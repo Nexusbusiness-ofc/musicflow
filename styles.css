@@ -581,44 +581,6 @@ input:checked + .slider-toggle:before {
 }
 
 /* ==========================================================================
-   GOOGLE ADMOB / ADSENSE BANNER STYLING
-   ========================================================================== */
-.admob-banner-wrapper {
-  transition: all 0.3s ease;
-}
-
-.admob-slot {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.admob-slot ins.adsbygoogle {
-  background: transparent !important;
-}
-
-.admob-badge {
-  font-size: 8px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.admob-fallback-card {
-  transition: all 0.3s ease;
-}
-
-.admob-slot:has(iframe) .admob-fallback-card,
-.admob-slot:has(ins[data-ad-status="filled"]) .admob-fallback-card,
-.admob-slot:has(ins[data-adsbygoogle-status="done"] iframe) .admob-fallback-card {
-  display: none !important;
-}
-
-/* ==========================================================================
    FLOATING ISLAND MINI-PLAYER & MOBILE NAV DOCK
    ========================================================================== */
 #mini-player {
