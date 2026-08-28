@@ -608,6 +608,16 @@ input:checked + .slider-toggle:before {
   color: rgba(255, 255, 255, 0.6);
 }
 
+.admob-fallback-card {
+  transition: all 0.3s ease;
+}
+
+.admob-slot:has(iframe) .admob-fallback-card,
+.admob-slot:has(ins[data-ad-status="filled"]) .admob-fallback-card,
+.admob-slot:has(ins[data-adsbygoogle-status="done"] iframe) .admob-fallback-card {
+  display: none !important;
+}
+
 /* ==========================================================================
    FLOATING ISLAND MINI-PLAYER & MOBILE NAV DOCK
    ========================================================================== */
