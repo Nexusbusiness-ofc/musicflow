@@ -2304,8 +2304,11 @@
 
     openQueueModal() {
       this.renderQueueModalContent();
-      document.getElementById('modal-queue').classList.remove('hidden');
-      if (window.lucide) window.lucide.createIcons();
+      const modal = document.getElementById('modal-queue');
+      if (modal) {
+        modal.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons({ root: modal });
+      }
     }
 
     renderQueueModalContent() {
@@ -2342,7 +2345,7 @@
             </button>
           </div>
         `;
-        if (window.lucide) window.lucide.createIcons();
+        if (window.lucide) window.lucide.createIcons({ root: upcomingContainer });
         return;
       }
 
@@ -2390,7 +2393,7 @@
         `;
       }).join('');
 
-      if (window.lucide) window.lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons({ root: upcomingContainer });
     }
 
     selectQueueItem(actualIndex) {
@@ -2448,8 +2451,11 @@
 
     openAddToQueueModal() {
       this.filterAddToQueueList('');
-      document.getElementById('modal-add-to-queue').classList.remove('hidden');
-      if (window.lucide) window.lucide.createIcons();
+      const modal = document.getElementById('modal-add-to-queue');
+      if (modal) {
+        modal.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons({ root: modal });
+      }
     }
 
     filterAddToQueueList(query) {
@@ -2489,7 +2495,7 @@
         </div>
       `).join('');
 
-      if (window.lucide) window.lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons({ root: container });
     }
 
     addSongToActiveQueue(songId, playNext = false) {
@@ -2693,8 +2699,11 @@
         this.renderSynchronizedLyrics('', null);
       }
 
-      document.getElementById('modal-lyrics').classList.remove('hidden');
-      if (window.lucide) window.lucide.createIcons();
+      const modal = document.getElementById('modal-lyrics');
+      if (modal) {
+        modal.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons({ root: modal });
+      }
     }
 
     renderSynchronizedLyrics(lyricsText, songId) {
@@ -2735,7 +2744,7 @@
             </div>
           </div>
         `;
-        if (window.lucide) window.lucide.createIcons();
+        if (window.lucide) window.lucide.createIcons({ root: container });
         return;
       }
 
