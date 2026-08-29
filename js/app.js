@@ -304,93 +304,19 @@
   }
 
   // ==========================================
-  // SELF-HOSTED STEREO AUDIO STARTER TRACKS
+  // CLEANUP PREDEFINED / DEMO TRACKS
   // ==========================================
 
-  async function seedAutomaticStarterTracks(userId) {
-    const starters = [
-      {
-        id: 'starter_1',
-        title: 'VÍCIOS < 3',
-        artist: 'Chico da Tina',
-        album: 'Minho Rhapsody',
-        genre: 'Hip Hop / Trap',
-        year: 2024,
-        duration: 14,
-        audio_url: './assets/audio/vicios.wav',
-        cover_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=500&q=80',
-        lyrics: `[00:00.00] Vícios na noite, rima no sangue\n[00:03.00] Do Minho para o mundo a acelerar\n[00:06.00] Que fusão explosiva é esta!?\n[00:09.00] Chico da Tina a comandar o som\n[00:11.00] Trap português no topo da cena\n[00:13.00] MusicFlow em alta rotação!`
-      },
-      {
-        id: 'starter_2',
-        title: 'Cafeína',
-        artist: 'Plutonio',
-        album: 'Sacrifício',
-        genre: 'Hip Hop / R&B',
-        year: 2024,
-        duration: 14,
-        audio_url: './assets/audio/cafeina.wav',
-        cover_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=500&q=80',
-        lyrics: `[00:00.00] Madrugada fria com sabor a cafeína\n[00:03.50] Histórias da rua que a vida ensina\n[00:07.00] A mente viaja na melodia\n[00:10.00] Cada batida com nostalgia\n[00:13.00] Mais uma noite até o dia raiar`
-      },
-      {
-        id: 'starter_3',
-        title: 'Devia Ir',
-        artist: 'Wet Bed Gang',
-        album: 'IV',
-        genre: 'Trap / Hip Hop',
-        year: 2024,
-        duration: 14,
-        audio_url: './assets/audio/devia_ir.wav',
-        cover_url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=500&q=80',
-        lyrics: `[00:00.00] Sei que devia ir mas vou ficar\n[00:03.50] O som tá alto e não quero parar\n[00:07.00] A família unida na vibração\n[00:10.00] Mais uma barra no coração\n[00:13.00] Wet Bed Gang no controlo!`
-      },
-      {
-        id: 'starter_4',
-        title: 'Tata',
-        artist: 'Slow J',
-        album: 'Afro Fado',
-        genre: 'Alternative / Fado Hip Hop',
-        year: 2024,
-        duration: 14,
-        audio_url: './assets/audio/tata.wav',
-        cover_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=500&q=80',
-        lyrics: `[00:00.00] Raízes fundas na terra que piso\n[00:03.50] No som da guitarra acho o meu siso\n[00:07.00] Afro Fado em cada respiração\n[00:10.00] Slow J a cantar com emoção\n[00:13.00] O amor é a resposta final`
-      },
-      {
-        id: 'starter_5',
-        title: 'Blinding Lights',
-        artist: 'The Weeknd',
-        album: 'After Hours',
-        genre: 'Synthwave / Pop',
-        year: 2023,
-        duration: 14,
-        audio_url: './assets/audio/blinding_lights.wav',
-        cover_url: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=500&q=80',
-        lyrics: `[00:00.00] I said, ooh, I'm blinded by the lights\n[00:03.50] No, I can't sleep until I feel your touch\n[00:07.00] I said, ooh, I'm drowning in the night\n[00:10.50] Oh, when I'm like this, you're the one I trust\n[00:13.00] Blinded by the lights!`
+  async function cleanupStarterAndDemoTracks(userId) {
+    try {
+      const all = await idbGetAll('songs');
+      for (const s of all) {
+        if (s.id && (s.id.startsWith('starter_') || s.id.startsWith('demo_') || (s.audio_url && s.audio_url.includes('./assets/audio/')))) {
+          await idbDelete('songs', s.id);
+        }
       }
-    ];
-
-    for (const item of starters) {
-      const songData = {
-        user_id: userId,
-        id: item.id,
-        title: item.title,
-        artist: item.artist,
-        album: item.album,
-        genre: item.genre,
-        year: item.year,
-        track_number: 1,
-        duration: item.duration,
-        audio_url: item.audio_url,
-        cover_url: item.cover_url,
-        file_format: 'audio/wav',
-        file_size: 1234800,
-        bitrate: '705 kbps',
-        sample_rate: '44.1 kHz',
-        lyrics: item.lyrics
-      };
-      await idbPut('songs', songData);
+    } catch (e) {
+      console.warn('Cleanup demo error:', e);
     }
   }
 
@@ -1405,31 +1331,10 @@
     }
 
     async loadAppData() {
+      // Auto-cleanup any previously loaded demo/starter tracks
+      await cleanupStarterAndDemoTracks(this.user.id);
+
       this.songs = await getSongsForUser(this.user.id);
-
-      // Auto migrate and refresh starter tracks to reliable self-hosted paths
-      const starterAudioMap = {
-        'starter_1': './assets/audio/vicios.wav',
-        'starter_2': './assets/audio/cafeina.wav',
-        'starter_3': './assets/audio/devia_ir.wav',
-        'starter_4': './assets/audio/tata.wav',
-        'starter_5': './assets/audio/blinding_lights.wav'
-      };
-
-      let needsReseed = this.songs.length === 0;
-      for (const song of this.songs) {
-        if (starterAudioMap[song.id] && song.audio_url !== starterAudioMap[song.id]) {
-          song.audio_url = starterAudioMap[song.id];
-          song.duration = 14;
-          await updateSongInLibrary(song);
-        }
-      }
-
-      if (needsReseed) {
-        await seedAutomaticStarterTracks(this.user.id);
-        this.songs = await getSongsForUser(this.user.id);
-      }
-
       this.playlists = await getUserPlaylists(this.user.id);
 
       // Sync settings counter
