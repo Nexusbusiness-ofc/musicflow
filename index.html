@@ -39,7 +39,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles.css?v=20260830_34">
+  <link rel="stylesheet" href="styles.css?v=20260830_35">
 </head>
 <body class="bg-[var(--bg-main)] text-[var(--text-primary)] antialiased select-none min-h-screen flex flex-col md:flex-row overflow-x-hidden relative">
 
@@ -1621,11 +1621,11 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- App Main Scripts with Cache Buster -->
-  <script src="js/app.js?v=20260830_34"></script>
+  <script src="js/app.js?v=20260830_35"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=20260830_34')
+        navigator.serviceWorker.register('./sw.js?v=20260830_35')
           .then((reg) => {
             reg.update();
             reg.addEventListener('updatefound', () => {
