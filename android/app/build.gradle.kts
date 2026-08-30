@@ -16,12 +16,14 @@ android {
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     buildConfigField("String", "ADMOB_BANNER_AD_UNIT_ID", "\"ca-app-pub-2898806335291249/7684757702\"")
+    buildConfigField("String", "ADMOB_NATIVE_AD_UNIT_ID", "\"ca-app-pub-2898806335291249/4629670795\"")
   }
 
   buildTypes {
     debug {
       // O ID oficial de teste impede impressões/cliques reais durante o desenvolvimento.
       buildConfigField("String", "ADMOB_BANNER_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
+      buildConfigField("String", "ADMOB_NATIVE_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/2247696110\"")
     }
     release {
       isMinifyEnabled = false
