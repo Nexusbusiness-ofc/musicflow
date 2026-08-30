@@ -309,10 +309,50 @@
 
   async function cleanupStarterAndDemoTracks(userId) {
     try {
+      // 1. Clean native IndexedDB 'musicflow_db' songs
       const all = await idbGetAll('songs');
+      const demoTitles = [
+        'vícios < 3', 'cafeína', 'devia ir', 'tata', 'blinding lights',
+        'midnight flow', 'sol de verão', 'urban beats', 'electric dream',
+        'café & bossa', 'riff rebelde', 'sinfonia da chuva', 'veludo negro',
+        'caminhos de lisboa', 'deep focus'
+      ];
+      const demoArtists = [
+        'chico da tina', 'plutonio', 'wet bed gang', 'slow j', 'the weeknd',
+        'aura wave', 'luzia silva', 'k-pulse', 'antónio & trio', 'thunder voltage', 'orquestra harmonia'
+      ];
+
       for (const s of all) {
-        if (s.id && (s.id.startsWith('starter_') || s.id.startsWith('demo_') || (s.audio_url && s.audio_url.includes('./assets/audio/')))) {
+        const titleLower = (s.title || '').toLowerCase().trim();
+        const artistLower = (s.artist || '').toLowerCase().trim();
+        const isDemo = (s.id && (s.id.startsWith('starter_') || s.id.startsWith('demo_') || s.id.startsWith('sng_demo'))) ||
+                       (s.audio_url && s.audio_url.includes('./assets/audio/')) ||
+                       demoTitles.includes(titleLower) ||
+                       demoArtists.includes(artistLower) ||
+                       (!s.audio_blob && (!s.file_size || s.file_size < 1000));
+        if (isDemo) {
           await idbDelete('songs', s.id);
+        }
+      }
+
+      // 2. Clean demo playlists
+      const pls = await idbGetAll('playlists');
+      const demoPlNames = ['as minhas favoritas', 'néons da noite', 'chill & focus'];
+      for (const p of pls) {
+        if (demoPlNames.includes((p.name || '').toLowerCase().trim())) {
+          await idbDelete('playlists', p.id);
+        }
+      }
+
+      // 3. Also delete Dexie 'MusicFlowDatabase' if exists in browser
+      if (window.indexedDB && window.indexedDB.databases) {
+        const dbs = await window.indexedDB.databases();
+        for (const dbInfo of dbs) {
+          if (dbInfo.name === 'MusicFlowDatabase') {
+            try {
+              window.indexedDB.deleteDatabase('MusicFlowDatabase');
+            } catch (err) {}
+          }
         }
       }
     } catch (e) {
@@ -1287,6 +1327,7 @@
       this.activeLyricIndex = -1;
       this.pendingOnlineLyrics = '';
       this.lyricsRecognizingSongId = null;
+      this.adPrivacyOptionsRequired = false;
 
       // Queue Drag and Drop State
       this.draggedQueueIndex = null;
@@ -1325,6 +1366,9 @@
       this.bindKeyboardShortcuts();
       this.bindSwipeGestures();
       this.bindDragAndDrop();
+      window.addEventListener('musicflow:ad-privacy-availability', (event) => {
+        this.setAdPrivacyOptionsAvailable(Boolean(event.detail && event.detail.required));
+      });
 
       if (window.lucide) window.lucide.createIcons();
       this.navigateTo('home');
@@ -1417,6 +1461,20 @@
       };
       this.showToast(`Tema alterado para: ${themeLabels[themeName] || themeName}`);
       if (window.lucide) window.lucide.createIcons();
+    }
+
+    setAdPrivacyOptionsAvailable(required) {
+      this.adPrivacyOptionsRequired = required;
+      const settings = document.getElementById('ad-privacy-settings');
+      if (settings) settings.classList.toggle('hidden', !required);
+    }
+
+    openAdPrivacyOptions() {
+      if (window.MusicFlowAndroid && typeof window.MusicFlowAndroid.openPrivacyOptions === 'function') {
+        window.MusicFlowAndroid.openPrivacyOptions();
+      } else {
+        this.showToast('As opções de privacidade dos anúncios estão disponíveis na app Android.');
+      }
     }
 
     async toggleNotifications(enabled) {
