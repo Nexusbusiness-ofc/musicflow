@@ -11,7 +11,15 @@
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/adView" />
+        android:layout_above="@id/nativeAdContainer" />
+
+    <!-- Cartão de anúncio nativo; permanece invisível até receber um anúncio. -->
+    <FrameLayout
+        android:id="@+id/nativeAdContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/adViewContainer"
+        android:visibility="gone" />
 
     <!-- O banner adaptativo é criado pela Activity para usar a largura real do ecrã. -->
     <FrameLayout
