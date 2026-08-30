@@ -39,7 +39,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Custom Stylesheet with Cache Buster -->
-  <link rel="stylesheet" href="styles.css?v=20260829_32">
+  <link rel="stylesheet" href="styles.css?v=20260830_34">
 </head>
 <body class="bg-[var(--bg-main)] text-[var(--text-primary)] antialiased select-none min-h-screen flex flex-col md:flex-row overflow-x-hidden relative">
 
@@ -711,7 +711,22 @@
             </div>
           </div>
 
-          <!-- 5. LANGUAGE SELECTOR -->
+          <!-- 5. AD PRIVACY OPTIONS (shown only when required by UMP) -->
+          <div id="ad-privacy-settings" class="hidden bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-3">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-base font-bold flex items-center gap-2 text-white">
+                  <i data-lucide="shield-check" class="w-5 h-5 text-brand-spotify"></i> Privacidade dos anúncios
+                </h3>
+                <p class="text-xs text-[var(--text-secondary)] mt-1">Revê ou altera as tuas preferências de publicidade personalizada.</p>
+              </div>
+              <button onclick="app.openAdPrivacyOptions()" class="shrink-0 bg-brand-spotify/15 hover:bg-brand-spotify/25 text-brand-spotify border border-brand-spotify/30 text-xs font-bold px-3.5 py-2 rounded-xl transition">
+                Gerir
+              </button>
+            </div>
+          </div>
+
+          <!-- 6. LANGUAGE SELECTOR -->
           <div class="bg-[var(--bg-card)] border border-[var(--border-color)] p-5 rounded-2xl space-y-4">
             <h3 class="text-base font-bold flex items-center gap-2 text-white">
               <i data-lucide="globe" class="w-5 h-5 text-cyan-400"></i> Idioma da Aplicação (Language)
@@ -1606,11 +1621,11 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- App Main Scripts with Cache Buster -->
-  <script src="js/app.js?v=20260829_32"></script>
+  <script src="js/app.js?v=20260830_34"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=20260829_32')
+        navigator.serviceWorker.register('./sw.js?v=20260830_34')
           .then((reg) => {
             reg.update();
             reg.addEventListener('updatefound', () => {
