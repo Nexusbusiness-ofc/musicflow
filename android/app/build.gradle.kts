@@ -5,19 +5,24 @@
 
 android {
   namespace = "com.nexusbusiness.musicflow"
-  compileSdk = 34
+  compileSdk = 35
 
   defaultConfig {
     applicationId = "com.nexusbusiness.musicflow"
     minSdk = 24
-    targetSdk = 34
+    targetSdk = 35
     versionCode = 1
     versionName = "1.0.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    buildConfigField("String", "ADMOB_BANNER_AD_UNIT_ID", "\"ca-app-pub-2898806335291249/7684757702\"")
   }
 
   buildTypes {
+    debug {
+      // O ID oficial de teste impede impressões/cliques reais durante o desenvolvimento.
+      buildConfigField("String", "ADMOB_BANNER_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
+    }
     release {
       isMinifyEnabled = false
       proguardFiles(
@@ -25,6 +30,10 @@ android {
         "proguard-rules.pro"
       )
     }
+  }
+
+  buildFeatures {
+    buildConfig = true
   }
 
   compileOptions {
@@ -45,4 +54,6 @@ dependencies {
 
   // Google Mobile Ads SDK (AdMob)
   implementation("com.google.android.gms:play-services-ads:25.4.0")
+  // Consentimento de privacidade para anúncios (Google UMP / GDPR)
+  implementation("com.google.android.ump:user-messaging-platform:4.0.0")
 }
